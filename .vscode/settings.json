@@ -10,6 +10,7 @@
         "pipelinelogo",
         "println",
         "slurm",
-        "subworkflow"
+        "subworkflow",
+        "vsearch"
     ]
 }

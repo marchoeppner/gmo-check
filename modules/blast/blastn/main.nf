@@ -1,5 +1,4 @@
 process BLAST_BLASTN {
-
     publishDir "${params.outdir}/BlastN", mode: 'copy'
 
     label 'short_parallel'
@@ -10,14 +9,15 @@ process BLAST_BLASTN {
         'quay.io/biocontainers/blast:2.15.0--pl5321h6f7f691_1' }"
 
     input:
-    tuple val(meta),path(fasta)
-    tuple path(db)
+    tuple val(meta), path(fasta)
+    path(db)
 
     output:
-    tuple val(meta),path(result), emit: blastout
+    tuple val(meta), path(blastout), emit: results
+    path("versions.yml"), emit: versions
 
     script:
-    blastout = meta.sample_id + ".blast.txt"
+    blastout = meta.sample_id + '.blast.txt'
 
     """
     DB=`find -L ./ -name "*.nal" | sed 's/\\.nal\$//'`
@@ -28,9 +28,10 @@ process BLAST_BLASTN {
 
     blastn -num_threads ${task.cpus} \
         -db \$DB \
-        -outfmt 6 \
         -query $fasta \
-        -out $blastout
+        -outfmt 0 \
+        -out $blastout \
+        -evalue 0.0001
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

@@ -1,12 +1,11 @@
-include { VSEARCH_FASTQMERGE }      from "./../modules/vsearch/fastqmerge"
-include { VSEARCH_FASTXUNIQUES }    from "./../modules/vsearch/fastxuniques"
-include { VSEARCH_FASTQFILTER }     from "./../modules/vsearch/fastqfilter"
-include { BLAST_BLASTN }            from "./../modules/blast/blastn"
+include { VSEARCH_FASTQMERGE }      from './../../modules/vsearch/fastqmerge'
+include { VSEARCH_FASTXUNIQUES }    from './../../modules/vsearch/fastxuniques'
+include { VSEARCH_FASTQFILTER }     from './../../modules/vsearch/fastqfilter'
+include { BLAST_BLASTN }            from './../../modules/blast/blastn'
 
 ch_versions = Channel.from([])
 
 workflow VSEARCH_WORKFLOW {
-
     take:
     reads
     db
@@ -32,9 +31,9 @@ workflow VSEARCH_WORKFLOW {
         VSEARCH_FASTXUNIQUES.out.fasta,
         db
     )
+    ch_versions = ch_versions.mix(BLAST_BLASTN.out.versions)
 
     emit:
     versions = ch_versions
-    results = BLAST_BLASTN.out.blastout
-
+    results = BLAST_BLASTN.out.results
 }

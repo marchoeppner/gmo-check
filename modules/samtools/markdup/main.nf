@@ -1,10 +1,11 @@
 process SAMTOOLS_MARKDUP {
+    
     conda 'bioconda::samtools=1.19.2'
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/samtools:1.19.2--h50ea8bc_0' :
         'quay.io/biocontainers/samtools:1.19.2--h50ea8bc_0' }"
 
-    label 'medium_parallel'
+    label 'short_parallel'
 
     tag "${meta.sample_id}"
 
@@ -12,7 +13,6 @@ process SAMTOOLS_MARKDUP {
 
     input:
     tuple val(meta), path(merged_bam), path(merged_bam_index)
-    tuple path(fasta), path(fai), path(dict)
 
     output:
     tuple val(meta), path(outfile_bam), path(outfile_bai), emit: bam
@@ -26,7 +26,7 @@ process SAMTOOLS_MARKDUP {
     outfile_metrics = namePrefix + '_duplicate_metrics.txt'
 
     """
-    samtools markdup -@ ${task.cpus} --reference $fasta $merged_bam $outfile_bam
+    samtools markdup -@ ${task.cpus} $merged_bam $outfile_bam
     samtools index $outfile_bam
     samtools stats $outfile_bam > $outfile_metrics
 

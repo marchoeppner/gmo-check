@@ -8,30 +8,30 @@ workflow INPUT_CHECK {
 
     main:
     samplesheet
-        .splitCsv(header:true, sep:',')
-        .map { dh ->
-            fastq_channel_from_hash(dh)
-        }
+        .splitCsv(header:true, sep: ',')
+        .map { create_fastq_channel(it) }
         .set { reads }
 
     emit:
     reads // channel: [ val(meta), [ reads ] ]
 }
 
-// Function to get list of [ meta, [ fastq_1, fastq_2 ] ]
-def fastq_channel_from_hash(LinkedHashMap row) {
-    meta = [:]
-    meta.sample_id    = row.patient_id
-    meta.library_id   = row.library_id
-    meta.readgroup_id = row.rgID
+def create_fastq_channel(LinkedHashMap row) {
+    // create meta map
+    def meta = [:]
+    meta.sample_id         = row.sample_id
+    meta.readgroup_id      = row.readgroup_id
+    meta.library_id        = row.library_id
 
-    array = []
+    // add path(s) of the fastq file(s) to the meta map
+    def fastq_meta = []
     if (!file(row.R1).exists()) {
         exit 1, "ERROR: Please check input samplesheet -> Read 1 FastQ file does not exist!\n${row.R1}"
     }
     if (!file(row.R2).exists()) {
         exit 1, "ERROR: Please check input samplesheet -> Read 2 FastQ file does not exist!\n${row.R2}"
     }
-    array = [ meta, [ file(row.R1), file(row.R2) ] ]
-    return array
+    fastq_meta = [ meta, file(row.R1), file(row.R2) ]
+
+    return fastq_meta
 }

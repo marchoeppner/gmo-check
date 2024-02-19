@@ -1,4 +1,5 @@
 process BLAST_MAKEBLASTDB {
+    tag "$fasta"
 
     publishDir "${params.outdir}/BlastDB", mode: 'copy'
 
@@ -14,9 +15,10 @@ process BLAST_MAKEBLASTDB {
 
     output:
     path('*.n*'), emit: db
+    path("versions.yml"), emit: versions
 
     script:
-    def is_compressed = fasta.getExtension() == "gz" ? true : false
+    def is_compressed = fasta.getExtension() == 'gz' ? true : false
     def fasta_name = is_compressed ? fasta.getBaseName() : fasta
 
     """
@@ -25,7 +27,7 @@ process BLAST_MAKEBLASTDB {
     fi
 
     makeblastdb \
-        -in $fasta \
+        -in $fasta_name \
         -dbtype nucl \
         -out $fasta_name
 

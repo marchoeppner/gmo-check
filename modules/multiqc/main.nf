@@ -16,8 +16,7 @@ process MULTIQC {
     script:
 
     """
-    cp ${params.logo} .
-    cp ${baseDir}/assets/multiqc_config.yaml .
+
     multiqc .
 
     cat <<-END_VERSIONS > versions.yml

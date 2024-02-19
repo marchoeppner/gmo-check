@@ -76,7 +76,7 @@ workflow.onComplete {
     outputTf = new File(outputDir, 'pipeline_report.txt')
     outputTf.withWriter { w -> w << email_info }
 
-   // make txt template
+    // make txt template
     engine = new groovy.text.GStringTemplateEngine()
 
     tf = new File("$baseDir/assets/email_template.txt")
