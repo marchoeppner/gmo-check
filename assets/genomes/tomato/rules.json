@@ -1,0 +1,25 @@
+{
+    "rules": {
+        "vsearch-blast": {
+            "payload": [
+                {
+                    "format": "XML",
+                    "target": "SiGAD3|NM_001246898.2",
+                    "matcher": "AAAG-TGGA",
+                    "yields": "Diese Probe enthält eine GABA Mutation in SIGAD3. Nachweis erbraucht über: Amplicon Analyse."
+                }
+            ]
+            
+        },
+        "bwa-freebayes": {
+            "payload": [
+                {
+                    "format": "VCF",
+                    "target": "1:14834",
+                    "matcher": "1\t14834\t.\tGTG\tGTTG",
+                    "yields": "Diese Probe enthält eine GABA Mutation in SIGAD3. Nachweis erbracht über: Varianten Analyse."    
+                } 
+            ]
+        }
+    }
+}

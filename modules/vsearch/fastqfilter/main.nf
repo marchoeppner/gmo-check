@@ -1,7 +1,7 @@
 process VSEARCH_FASTQFILTER {
     tag "${meta.sample_id}"
 
-    publishDir "${params.outdir}/VSEARCH", mode: 'copy'
+    publishDir "${params.outdir}/${meta.sample_id}/VSEARCH", mode: 'copy'
 
     label 'short_serial'
 

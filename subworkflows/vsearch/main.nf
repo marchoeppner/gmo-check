@@ -2,6 +2,7 @@ include { VSEARCH_FASTQMERGE }      from './../../modules/vsearch/fastqmerge'
 include { VSEARCH_FASTXUNIQUES }    from './../../modules/vsearch/fastxuniques'
 include { VSEARCH_FASTQFILTER }     from './../../modules/vsearch/fastqfilter'
 include { BLAST_BLASTN }            from './../../modules/blast/blastn'
+include { PTRIMMER }                from "./../../modules/ptrimmer"
 
 ch_versions = Channel.from([])
 
@@ -9,11 +10,19 @@ workflow VSEARCH_WORKFLOW {
     take:
     reads
     db
+    amplicon_txt
 
     main:
 
+    // Remove PCR adapter sites from reads
+    PTRIMMER(
+        reads,
+        amplicon_txt
+    )
+    ch_versions = ch_versions.mix(PTRIMMER.out.versions)
+
     VSEARCH_FASTQMERGE(
-        reads
+        PTRIMMER.out.reads
     )
     ch_versions = ch_versions.mix(VSEARCH_FASTQMERGE.out.versions)
 

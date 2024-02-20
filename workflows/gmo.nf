@@ -5,15 +5,17 @@ include { MULTIQC }                     from './../modules/multiqc'
 include { BLAST_MAKEBLASTDB }           from './../modules/blast/makeblastdb'
 include { VSEARCH_WORKFLOW }            from './../subworkflows/vsearch'
 include { BWAMEM2_WORKFLOW }            from './../subworkflows/bwamem2'
+include { BIOBLOOMTOOLS_CATEGORIZER }   from './../modules/biobloomtools/categorizer'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from './../modules/custom/dumpsoftwareversions'
 
 ch_db_file      = Channel.fromPath(params.references['blastdb'], checkIfExists: true)
 fasta           = params.references.genomes['tomato'].fasta
+fai             = params.references.genomes['tomato'].fai
 dict            = params.references.genomes['tomato'].dict
-references      = [ fasta, dict ]
+references      = [ fasta, fai, dict ]
 
-ch_primers      = Channel.fromPath(params.references.genomes['tomato'].primers).collect()
 ch_bed          = Channel.fromPath(params.references.genomes['tomato'].bed).collect()
+ch_amplicon_txt = Channel.fromPath(params.references.genomes['tomato'].amplicon_txt).collect()
 
 samplesheet     = Channel.fromPath(params.input)
 
@@ -30,10 +32,16 @@ workflow GMO {
     // read the sample sheet and turn into channel with meta hash
     INPUT_CHECK(samplesheet)
 
+    // Remove PhiX using a bloom filter
+    BIOBLOOMTOOLS_CATEGORIZER(
+        INPUT_CHECK.out.reads
+    )
+    ch_versions = ch_versions.mix(BIOBLOOMTOOLS_CATEGORIZER.out.versions)
+    multiqc_files = multiqc_files.mix(BIOBLOOMTOOLS_CATEGORIZER.out.results)
+
     // trim reads using fastP
     FASTP(
-        INPUT_CHECK.out.reads,
-        ch_primers
+        BIOBLOOMTOOLS_CATEGORIZER.out.reads
     )
     ch_versions = ch_versions.mix(FASTP.out.versions)
     multiqc_files = multiqc_files.mix(FASTP.out.json)
@@ -42,12 +50,11 @@ workflow GMO {
     if ('bwa2' in tools) {
         BWAMEM2_WORKFLOW(
             FASTP.out.reads,
-            fasta,
-            dict,
+            references,
             ch_bed
         )
         multiqc_files = multiqc_files.mix(BWAMEM2_WORKFLOW.out.qc)
-        ch_versions = BWAMEM2_WORKFLOW.out.versions
+        ch_versions = ch_versions.mix(BWAMEM2_WORKFLOW.out.versions)
     }
 
     // Merging and deduplication of amplicons combined with BlastN
@@ -59,7 +66,8 @@ workflow GMO {
 
         VSEARCH_WORKFLOW(
             FASTP.out.reads,
-            BLAST_MAKEBLASTDB.out.db.collect()
+            BLAST_MAKEBLASTDB.out.db.collect(),
+            ch_amplicon_txt
         )
         ch_versions = ch_versions.mix(VSEARCH_WORKFLOW.out.versions)
     }

@@ -12,8 +12,8 @@ process FREEBAYES {
 
     input:
     tuple val(meta), path(bam), path(bai)
-    path(fasta)
-    
+    tuple path(fasta),path(fai),path(dict)
+
     output:
     tuple val(meta), path(vcf), emit: vcf
     path("versions.yml"), emit: versions
@@ -27,6 +27,7 @@ process FREEBAYES {
         --pooled-continuous \
         --min-alternate-count ${params.freebayes_min_alternate_count} \
         --min-alternate-fraction ${params.freebayes_min_alternate_frac} \
+        -C 500 \
         $bam > $vcf
 
     cat <<-END_VERSIONS > versions.yml

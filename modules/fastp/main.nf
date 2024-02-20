@@ -12,7 +12,6 @@ process FASTP {
 
     input:
     tuple val(meta), path(r1), path(r2)
-    path(primers)
 
     output:
     tuple val(meta), path(r1_trim), path(r2_trim), emit: reads
@@ -26,10 +25,6 @@ process FASTP {
     json = file(r1).getBaseName() + '.fastp.json'
     html = file(r2).getBaseName() + '.fastp.html'
 
-    def options = ""
-    if (primers) {
-        options = "--adapter_fasta ${primers}"
-    }
     """
     fastp -c --in1 $r1 --in2 $r2 \
     --out1 $r1_trim \
@@ -38,7 +33,7 @@ process FASTP {
     -w ${task.cpus} \
     -j $json \
     -h $html \
-    --length_required 35 $options
+    --length_required 35 
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

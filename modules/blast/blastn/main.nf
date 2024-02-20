@@ -17,7 +17,7 @@ process BLAST_BLASTN {
     path("versions.yml"), emit: versions
 
     script:
-    blastout = meta.sample_id + '.blast.txt'
+    blastout = meta.sample_id + '.blast.xml'
 
     """
     DB=`find -L ./ -name "*.nal" | sed 's/\\.nal\$//'`
@@ -29,7 +29,7 @@ process BLAST_BLASTN {
     blastn -num_threads ${task.cpus} \
         -db \$DB \
         -query $fasta \
-        -outfmt 0 \
+        -outfmt 5 \
         -out $blastout \
         -evalue 0.0001
 

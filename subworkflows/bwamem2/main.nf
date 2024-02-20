@@ -2,7 +2,7 @@ include { BWAMEM2_MEM }             from './../../modules/bwamem2/mem'
 include { SAMTOOLS_MERGE }          from './../../modules/samtools/merge'
 include { SAMTOOLS_MARKDUP }        from './../../modules/samtools/markdup'
 include { SAMTOOLS_INDEX }          from './../../modules/samtools/index'
-include { SAMTOOLS_AMPLICONCLIP }   from '../../modules/samtools/ampliconclip'
+include { SAMTOOLS_AMPLICONCLIP }   from './../../modules/samtools/ampliconclip'
 include { FREEBAYES }               from './../../modules/freebayes'
 
 ch_versions = Channel.from([])
@@ -13,15 +13,13 @@ workflow BWAMEM2_WORKFLOW {
     take:
     reads
     fasta
-    dict
     bed
 
     main:
 
     BWAMEM2_MEM(
         reads,
-        fasta,
-        dict
+        fasta
     )
 
     ch_versions = ch_versions.mix(BWAMEM2_MEM.out.versions)
@@ -39,23 +37,16 @@ workflow BWAMEM2_WORKFLOW {
     }.set { bam_to_merge }
 
     SAMTOOLS_MERGE(bam_to_merge.multiple)
-
     ch_versions = ch_versions.mix(SAMTOOLS_MERGE.out.versions)
 
     SAMTOOLS_INDEX(SAMTOOLS_MERGE.out.bam.mix(bam_to_merge.single))
-
     ch_versions = ch_versions.mix(SAMTOOLS_INDEX.out.versions)
 
     SAMTOOLS_AMPLICONCLIP(
         SAMTOOLS_INDEX.out.bam,
         bed
     )
-
-    //SAMTOOLS_MARKDUP(
-    //    SAMTOOLS_INDEX.out.bam
-    //)
-    //ch_versions = ch_versions.mix(SAMTOOLS_MARKDUP.out.versions)
-    //ch_qc       = ch_qc.mix(SAMTOOLS_MARKDUP.out.report)
+    ch_versions = ch_versions.mix(SAMTOOLS_AMPLICONCLIP.out.versions)
 
     FREEBAYES(
         SAMTOOLS_AMPLICONCLIP.out.bam,

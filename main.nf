@@ -27,7 +27,8 @@ WorkflowMain.initialise(workflow, params, log)
 // TODO: Rename this and the file under lib/ to something matching this pipeline (e.g. WorkflowAmplicons)
 WorkflowPipeline.initialise(params, log)
 
-include { GMO } from './workflows/gmo'
+include { GMO }                 from './workflows/gmo'
+//include { BUILD_REFERENCES }    from './workflows/build_references'
 
 multiqc_report = Channel.from([])
 

@@ -1,7 +1,7 @@
 process VSEARCH_FASTXUNIQUES {
     tag "${meta.sample_id}"
 
-    publishDir "${params.outdir}/VSEARCH", mode: 'copy'
+    publishDir "${params.outdir}/${meta.sample_id}/VSEARCH", mode: 'copy'
 
     label 'short_serial'
 
@@ -21,7 +21,7 @@ process VSEARCH_FASTXUNIQUES {
     derep = fa.getBaseName() + '.unique.fasta'
 
     """
-    vsearch -fastx_uniques $fa -sizeout -relabel Unique -fastaout $derep
+    vsearch -fastx_uniques $fa -sizeout -relabel ${meta.sample_id}_Unique -fastaout $derep
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
