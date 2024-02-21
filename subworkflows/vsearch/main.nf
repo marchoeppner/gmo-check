@@ -6,6 +6,7 @@ include { PTRIMMER }                from "./../../modules/ptrimmer"
 include { BLAST_TO_REPORT }         from "./../../modules/helper/blast_to_report"
 
 ch_versions = Channel.from([])
+ch_reports  = Channel.from([])
 
 workflow VSEARCH_WORKFLOW {
     take:
@@ -54,7 +55,10 @@ workflow VSEARCH_WORKFLOW {
         BLAST_BLASTN.out.results.filter{ it[1].size() > 0 },
         rules
     )
+    ch_reports = ch_reports.mix(BLAST_TO_REPORT.out.json)
+
     emit:
     versions = ch_versions
     results = BLAST_BLASTN.out.results
+    reports = ch_reports
 }

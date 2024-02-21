@@ -21,6 +21,7 @@ opts.on("-h","--help","Display the usage information") {
 
 opts.parse! 
 
+# we ignore any results below this coverage
 min_coverage = 100
 
 output = { "sample" => options.sample, "matches" => [] }
@@ -65,6 +66,8 @@ rules.each do |rule|
         hits.each do |hit|
     
             target = hit["description"][0]["title"]
+
+            warn "Not the right target...!" unless target == rule["target"]
     
             hsps = hit["hsps"]
     
@@ -83,9 +86,9 @@ rules.each do |rule|
 
     if has_matched
         perc = (carrier_cov.to_f / total_cov.to_f) * 100
-        output["matches"] << { "rule" => rule_name , "Befund" => rule["positive_report"], "Anteil Variante %" => perc.round(2), "Abdeckung Referenzallel" => total_cov-carrier_cov, "Abdeckung Variantenallel" => carrier_cov }
+        output["matches"] << { "rule" => rule_name , "toolchain" => "vsearch", "result" => rule["positive_report"], "perc_gmo" => perc.round(2), "ref_cov" => total_cov-carrier_cov, "alt_cov" => carrier_cov }
     else
-        output["matches"] << { "rule" => rule_name , "Befund" => rule["negative_report"] }
+        output["matches"] << { "rule" => rule_name , "toolchain" => "vsearch", "result" => rule["negative_report"] }
     end
 
 end

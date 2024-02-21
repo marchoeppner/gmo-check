@@ -21,7 +21,7 @@ end
 ### Get the script arguments and open relevant files
 options = OpenStruct.new()
 opts = OptionParser.new()
-opts.banner = "Reads reports and makes a table"
+opts.banner = "Reads reports and makes an Excel table with one sheet per analysis rule"
 opts.separator ""
 opts.on("-o","--outfile", "=OUTFILE","Output file") {|argument| options.outfile = argument }
 opts.on("-h","--help","Display the usage information") {
@@ -31,10 +31,18 @@ opts.on("-h","--help","Display the usage information") {
 
 opts.parse! 
 
+color = {
+	"even" => "FFFFFF",
+	"uneven" => "d4e6f1"
+}
+
+negative_result = "-"
+
 files = Dir["*.json"]
 
 bucket = {}
 
+# awfully convuluted way to bin all the reports by rule and sample name
 files.group_by{|f| f.split(".")[0..-3].join}.each do |group,reports|
 
     blast = reports.find {|r| r.include?(".blast.")}
@@ -70,6 +78,7 @@ end
 workbook = RubyXL::Workbook.new
 page = 0
 
+# a bucket is a rule with all the matching reports, i.e. one page
 bucket.each do |rule,reports|
 
     sheet = workbook.worksheets[page]
@@ -78,13 +87,15 @@ bucket.each do |rule,reports|
     row = 0
     col = 0
 
-    sheet.add_cell(row,col,"Probe")
-    col += 1
-    sheet.add_cell(row,col,"Vsearch/Blast")
-    col += 1
-    sheet.add_cell(row,col,"Bwa2/Freebayes")
+    # The table header
+    [ "Probe", "Vsearch/Blast", "Bwa2/Freebayes"].each do |e|
+        sheet.add_cell(row,col,e)
+        sheet.sheet_data[row][col].change_font_bold(true)
+        sheet.change_column_width(col, 15)
+        col += 1
+    end
 
-    
+    # Each sample with all its reports (max 2)
     reports.group_by{|r| r["Sample"]}.sort.each do |sample,data|
 
         row += 1
@@ -92,24 +103,36 @@ bucket.each do |rule,reports|
         
         sheet.add_cell(row,col,sample)
         col += 1
+        
+        blast = data.find{ |d| d["toolchain"].include?("vsearch")}
+        freebayes = data.find{ |d| d["toolchain"].include?("bwa2")}
 
-        blast = data.find{|d| d["Befund"].include?("Amplicon")}
-        freebayes = data.find{|d| d["Befund"].include?("Varianten")}
-
-        blast ? b = blast["Anteil Variante %"] : b = "Kein Nachweis"
+        blast ? b = blast["perc_gmo"] : b = negative_result
         # Here we remove noisy results below 1%
-        if !b.to_s.include?("Nachweis")
-            b = "Kein Nachweis" if b.to_f < 1.0
+        if b.is_a?(Float)
+            b = negative_result if b.to_f < 1.0
         end
-        freebayes ? f = freebayes["Anteil Variante %"] : f = "Kein Nachweis"
+
+        if freebayes
+            freebayes.has_key?("perc_gmo") ? f = freebayes["perc_gmo"] : f = negative_result
+        else
+            f = "N/A"
+        end
 
         sheet.add_cell(row,col,b)
         col += 1
 
         sheet.add_cell(row,col,f)
 
+        row.even? ? bg = color["even"] : bg = color["uneven"]
+		sheet.change_row_fill(row, bg)
+        sheet.change_row_horizontal_alignment(row, 'right')
     end
 
+    sheet.change_column_border(0, :right, 'medium')
+    sheet.change_row_border(0, :bottom, 'medium')  
+
+    # increment page counter for the next rule, if any
     page += 1
 
 end

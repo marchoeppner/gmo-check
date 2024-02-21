@@ -17,7 +17,7 @@ In this example, the pipeline will assume it runs on a single computer with the 
 
 `-profile standard,podman` 
 
-`-profile standard,conda` 
+`-profile standard,conda` THIS ISN'T FULLY SUPPORTED YET! To Do
 
 b) with a site-specific config file
 

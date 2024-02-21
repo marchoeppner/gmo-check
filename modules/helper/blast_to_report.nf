@@ -2,7 +2,7 @@ process BLAST_TO_REPORT {
 
     tag "${meta.sample_id}"
 
-    publishDir "${params.outdir}/Reports", mode: 'copy'
+    publishDir "${params.outdir}/Reports/JSON", mode: 'copy'
 
     input:
     tuple val(meta),path(blast)

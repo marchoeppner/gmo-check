@@ -1,7 +1,7 @@
 process FREEBAYES {
     tag "${meta.sample_id}"
 
-    publishDir "${params.outdir}/Freebayes", mode: 'copy'
+    publishDir "${params.outdir}/Processing/Freebayes", mode: 'copy'
 
     label 'medium_serial'
 

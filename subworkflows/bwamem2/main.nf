@@ -8,6 +8,7 @@ include { VCF_TO_REPORT }           from './../../modules/helper/vcf_to_report'
 
 ch_versions = Channel.from([])
 ch_qc       = Channel.from([])
+ch_reports  = Channel.from([])
 
 workflow BWAMEM2_WORKFLOW {
 
@@ -71,9 +72,12 @@ workflow BWAMEM2_WORKFLOW {
         rules
     )
 
+    ch_reports = ch_reports.mix(VCF_TO_REPORT.out.json)
+
     emit:
     qc = ch_qc
     versions = ch_versions
     vcf = FREEBAYES.out.vcf
+    reports = ch_reports
 
 }

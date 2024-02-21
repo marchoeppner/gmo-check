@@ -6,6 +6,8 @@ include { BLAST_MAKEBLASTDB }           from './../modules/blast/makeblastdb'
 include { VSEARCH_WORKFLOW }            from './../subworkflows/vsearch'
 include { BWAMEM2_WORKFLOW }            from './../subworkflows/bwamem2'
 include { BIOBLOOMTOOLS_CATEGORIZER }   from './../modules/biobloomtools/categorizer'
+include { JSON_TO_XLSX }                from './../modules/helper/json_to_xlsx'
+include { JSON_TO_MQC }                 from './../modules/helper/json_to_mqc'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from './../modules/custom/dumpsoftwareversions'
 
 ch_db_file      = Channel.fromPath("${baseDir}/assets/blastdb.fasta.gz", checkIfExists: true)        // The built-in blast database
@@ -21,8 +23,9 @@ ch_rules        = Channel.fromPath(params.references.genomes[params.genome].rule
 
 samplesheet     = params.input ? Channel.fromPath(params.input) : Channel.value([])                  // the samplesheet with name and location of the sample(s)
 
-ch_versions = Channel.from([])
-multiqc_files = Channel.from([])
+ch_versions     = Channel.from([])
+multiqc_files   = Channel.from([])
+ch_reports      = Channel.from([])
 
 // Capture list of requested tool chains
 tools = params.tools ? params.tools.split(',').collect { it.trim().toLowerCase().replaceAll('-', '').replaceAll('_', '') } : []
@@ -57,10 +60,11 @@ workflow GMO {
             ch_rules,
             ch_targets
         )
-        multiqc_files = multiqc_files.mix(BWAMEM2_WORKFLOW.out.qc)
-        ch_versions = ch_versions.mix(BWAMEM2_WORKFLOW.out.versions)
+        multiqc_files   = multiqc_files.mix(BWAMEM2_WORKFLOW.out.qc)
+        ch_versions     = ch_versions.mix(BWAMEM2_WORKFLOW.out.versions)
+        ch_reports      = ch_reports.mix(BWAMEM2_WORKFLOW.out.reports)
     }
-
+    
     // Merging and deduplication of amplicons combined with BlastN
     if ('vsearch' in tools) {
         BLAST_MAKEBLASTDB(
@@ -75,12 +79,24 @@ workflow GMO {
             ch_rules
         )
         ch_versions = ch_versions.mix(VSEARCH_WORKFLOW.out.versions)
+        ch_reports  = ch_reports.mix(VSEARCH_WORKFLOW.out.reports)
     }
 
+    // Parse all reports and make an XLS file
+    JSON_TO_XLSX(
+        ch_reports.map { meta,j -> j}.collect()
+    )
+
+    // Parse all reports and make MultiQC compatible table
+    JSON_TO_MQC(
+        ch_reports.map { meta,j -> j}.collect()
+    )
+    multiqc_files = multiqc_files.mix(JSON_TO_MQC.out.mqc)
+    
+    // Dump all the software versions to YAML
     CUSTOM_DUMPSOFTWAREVERSIONS(
         ch_versions.unique().collectFile(name: 'collated_versions.yml')
     )
-
     multiqc_files = multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml)
 
     MULTIQC(

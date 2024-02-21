@@ -92,10 +92,10 @@ vcf = parse_vcf(options.vcf)
 
 rules.each do  |rule|
     
-    this_match = {}
-
     rule_name = rule["name"]
     rule_string = rule["matcher"]
+
+    this_match = { "toolchain" => "bwa2" , "rule" => rule_name}
 
     has_matched = false
 
@@ -109,21 +109,20 @@ rules.each do  |rule|
 
             has_matched = true
 
-            this_match["rule"] = rule_name
-            this_match["Befund"] = rule["positive_report"]
+            this_match["report"] = rule["positive_report"]
 
             genotype = this_sample["GT"]
 
             if genotype == "0/0"
-                this_match["Anmerkung"] = "Variantenfrequenz unter Call-Schwelle!"
+                this_match["comment"] = "Variantenfrequenz unter Call-Schwelle!"
             end
 
             rcov,acov = this_sample["AD"].split(",")
             cov_sum = acov.to_i + rcov.to_i
             perc = (acov.to_f / cov_sum.to_f)*100.0
-            this_match["Anteil Variante %"] = perc.round(2)
-            this_match["Abdeckung Referenzallel"] = rcov
-            this_match["Abdeckung Variantenallel"] = acov
+            this_match["perc_gmo"] = perc.round(2)
+            this_match["ref_cov"] = rcov
+            this_match["alt_cov"] = acov
 
             result["matches"] << this_match
 
@@ -131,7 +130,8 @@ rules.each do  |rule|
     end
 
     unless has_matched
-        result["matches"] << { "rule" => rule_name, "Befund" => rule["negative_report"]}
+        this_match["report"] = rule["negative_report"]
+        result["matches"] << this_match
     end
 
 end
