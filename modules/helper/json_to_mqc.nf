@@ -1,7 +1,6 @@
 process JSON_TO_MQC {
-
     tag 'All'
-    
+
     publishDir "${params.outdir}/Reports", mode: 'copy'
 
     input:
@@ -12,7 +11,7 @@ process JSON_TO_MQC {
 
     script:
 
-    """
-    reports_to_table.rb 
-    """
+    '''
+    reports_to_table.rb
+    '''
 }

@@ -12,7 +12,7 @@ process FREEBAYES {
 
     input:
     tuple val(meta), path(bam), path(bai)
-    tuple path(fasta),path(fai),path(dict)
+    tuple path(fasta), path(fai), path(dict)
     path(target_bed)
 
     output:

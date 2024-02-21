@@ -1,5 +1,4 @@
 process GUNZIP {
-
     tag "${meta.id}"
 
     label 'medium_serial'
@@ -12,10 +11,10 @@ process GUNZIP {
         'nf-core/ubuntu:20.04' }"
 
     input:
-    tuple val(meta),path(zipped)
+    tuple val(meta), path(zipped)
 
     output:
-    tuple val(meta),path(unzipped), emit: gunzip
+    tuple val(meta), path(unzipped), emit: gunzip
     path("versions.yml"), emit: versions
 
     script:

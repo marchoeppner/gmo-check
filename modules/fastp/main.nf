@@ -33,7 +33,7 @@ process FASTP {
     -w ${task.cpus} \
     -j $json \
     -h $html \
-    --length_required 35 
+    --length_required 35
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

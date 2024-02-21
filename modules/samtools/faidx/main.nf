@@ -1,5 +1,4 @@
 process SAMTOOLS_FAIDX {
-
     tag "${meta.id}"
 
     label 'short_serial'
@@ -12,7 +11,7 @@ process SAMTOOLS_FAIDX {
     publishDir "${params.outdir}/${meta.id}", mode: 'copy'
 
     input:
-    tuple val(meta),path(fasta)
+    tuple val(meta), path(fasta)
 
     output:
     tuple val(meta), path(idx), emit: fai

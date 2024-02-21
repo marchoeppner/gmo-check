@@ -7,7 +7,7 @@ process BWAMEM2_MEM {
 
     input:
     tuple val(meta), path(left), path(right)
-    tuple val(fasta),val(fai),val(dict)
+    tuple val(fasta), val(fai), val(dict)
 
     output:
     tuple val(meta), path(bam), emit: bam

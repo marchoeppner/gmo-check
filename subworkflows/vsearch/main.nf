@@ -2,8 +2,8 @@ include { VSEARCH_FASTQMERGE }      from './../../modules/vsearch/fastqmerge'
 include { VSEARCH_FASTXUNIQUES }    from './../../modules/vsearch/fastxuniques'
 include { VSEARCH_FASTQFILTER }     from './../../modules/vsearch/fastqfilter'
 include { BLAST_BLASTN }            from './../../modules/blast/blastn'
-include { PTRIMMER }                from "./../../modules/ptrimmer"
-include { BLAST_TO_REPORT }         from "./../../modules/helper/blast_to_report"
+include { PTRIMMER }                from './../../modules/ptrimmer'
+include { BLAST_TO_REPORT }         from './../../modules/helper/blast_to_report'
 
 ch_versions = Channel.from([])
 ch_reports  = Channel.from([])
@@ -52,7 +52,7 @@ workflow VSEARCH_WORKFLOW {
 
     // Check if a positive result is found
     BLAST_TO_REPORT(
-        BLAST_BLASTN.out.results.filter{ it[1].size() > 0 },
+        BLAST_BLASTN.out.results.filter { it[1].size() > 0 },
         rules
     )
     ch_reports = ch_reports.mix(BLAST_TO_REPORT.out.json)

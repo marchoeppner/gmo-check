@@ -1,5 +1,4 @@
 process BWAMEM2_INDEX {
-
     tag "${meta.id}"
 
     label 'medium_serial'
@@ -10,14 +9,14 @@ process BWAMEM2_INDEX {
     publishDir "${params.outdir}/${meta.id}", mode: 'copy'
 
     input:
-    tuple val(meta),path(fasta)
+    tuple val(meta), path(fasta)
 
     output:
     path('*'), emit: bwa_index
     path("versions.yml"), emit: versions
 
     script:
-    """    
+    """
     bwa-mem2 index $fasta
 
     cat <<-END_VERSIONS > versions.yml
@@ -26,5 +25,4 @@ process BWAMEM2_INDEX {
         samtools: \$(echo \$(samtools --version 2>&1) | sed 's/^.*samtools //; s/Using.*\$//')
     END_VERSIONS
     """
-
 }

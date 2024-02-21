@@ -1,5 +1,4 @@
 process BIOBLOOMTOOLS_CATEGORIZER {
-
     publishDir "${params.outdir}/Processing/Bloomfilter", mode: 'copy'
 
     label 'short_parallel'
@@ -20,13 +19,13 @@ process BIOBLOOMTOOLS_CATEGORIZER {
     path("*summary.tsv"), emit: results
 
     script:
-    filtered = meta.sample_id + "_" + meta.library_id + "_" + meta.readgroup_id
-    r1_trim = filtered + "_noMatch_1.fq.gz"
-    r2_trim = filtered + "_noMatch_2.fq.gz"
+    filtered = meta.sample_id + '_' + meta.library_id + '_' + meta.readgroup_id
+    r1_trim = filtered + '_noMatch_1.fq.gz'
+    r2_trim = filtered + '_noMatch_2.fq.gz'
 
     """
     biobloomcategorizer -p $filtered -t ${task.cpus} -n --fq --gz_out -i -e -f "${params.bloomfilter}" $r1 $r2
-    
+
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         BioBloomtools: \$(biobloomcategorizer -version 2>&1 | head -n1 | sed -e "s/.*) //g")

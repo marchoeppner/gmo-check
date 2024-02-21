@@ -11,7 +11,6 @@ ch_qc       = Channel.from([])
 ch_reports  = Channel.from([])
 
 workflow BWAMEM2_WORKFLOW {
-
     take:
     reads
     fasta
@@ -32,11 +31,11 @@ workflow BWAMEM2_WORKFLOW {
 
     // Group BAM files by sample, in case of multi-lane setup
     bam_mapped = BWAMEM2_MEM.out.bam.map { meta, bam ->
-        new_meta = [:]
-        new_meta.sample_id = meta.sample_id
+        newMmeta = [:]
+        newMeta.sample_id = meta.sample_id
         def groupKey = meta.sample_id
-        tuple(groupKey, new_meta, bam)
-    }.groupTuple(by: [0, 1]).map { g, new_meta, bam -> [ new_meta, bam ] }
+        tuple(groupKey, newMeta, bam)
+    }.groupTuple(by: [0, 1]).map { g, newMeta, bam -> [ newMeta, bam ] }
 
     // Check if any of the samples have more than one BAM file (i.e. multi-lane)
     bam_mapped.branch {
@@ -79,5 +78,4 @@ workflow BWAMEM2_WORKFLOW {
     versions = ch_versions
     vcf = FREEBAYES.out.vcf
     reports = ch_reports
-
-}
+    }

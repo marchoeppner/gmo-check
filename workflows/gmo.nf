@@ -12,9 +12,9 @@ include { CUSTOM_DUMPSOFTWAREVERSIONS } from './../modules/custom/dumpsoftwareve
 
 ch_db_file      = Channel.fromPath("${baseDir}/assets/blastdb.fasta.gz", checkIfExists: true)        // The built-in blast database
 fasta           = params.references.genomes[params.genome].fasta                                     // The reference genome to be used
-fai             = params.references.genomes[params.genome].fai                                       // The fasta index of the reference genome    
+fai             = params.references.genomes[params.genome].fai                                       // The fasta index of the reference genome
 dict            = params.references.genomes[params.genome].dict                                      // The dictionary of the reference genome
-references      = [ fasta, fai, dict ]                                                                                          
+references      = [ fasta, fai, dict ]
 
 ch_bed          = Channel.fromPath(params.references.genomes[params.genome].bed).collect()           // Bed file with primer locations
 ch_targets      = Channel.fromPath(params.references.genomes[params.genome].target_bed).collect()    // Bed file with calling regions
@@ -64,7 +64,7 @@ workflow GMO {
         ch_versions     = ch_versions.mix(BWAMEM2_WORKFLOW.out.versions)
         ch_reports      = ch_reports.mix(BWAMEM2_WORKFLOW.out.reports)
     }
-    
+
     // Merging and deduplication of amplicons combined with BlastN
     if ('vsearch' in tools) {
         BLAST_MAKEBLASTDB(
@@ -84,15 +84,15 @@ workflow GMO {
 
     // Parse all reports and make an XLS file
     JSON_TO_XLSX(
-        ch_reports.map { meta,j -> j}.collect()
+        ch_reports.map { meta, j -> j }.collect()
     )
 
     // Parse all reports and make MultiQC compatible table
     JSON_TO_MQC(
-        ch_reports.map { meta,j -> j}.collect()
+        ch_reports.map { meta, j -> j }.collect()
     )
     multiqc_files = multiqc_files.mix(JSON_TO_MQC.out.mqc)
-    
+
     // Dump all the software versions to YAML
     CUSTOM_DUMPSOFTWAREVERSIONS(
         ch_versions.unique().collectFile(name: 'collated_versions.yml')

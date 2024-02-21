@@ -18,18 +18,18 @@ process BLAST_MAKEBLASTDB {
     path("versions.yml"), emit: versions
 
     script:
-    def is_compressed = fasta.getExtension() == 'gz' ? true : false
-    def fasta_name = is_compressed ? fasta.getBaseName() : fasta
+    def isCompressed = fasta.getExtension() == 'gz' ? true : false
+    def fastaName = is_compressed ? fasta.getBaseName() : fasta
 
     """
-    if [ "${is_compressed}" == "true" ]; then
-        gzip -c -d ${fasta} > ${fasta_name}
+    if [ "${isCompressed}" == "true" ]; then
+        gzip -c -d ${fasta} > ${fastaName}
     fi
 
     makeblastdb \
-        -in $fasta_name \
+        -in $fastaName \
         -dbtype nucl \
-        -out $fasta_name
+        -out $fastaName
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

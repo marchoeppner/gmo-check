@@ -33,11 +33,9 @@ include { BUILD_REFERENCES }    from './workflows/build_references'
 multiqc_report = Channel.from([])
 
 workflow {
-
     if (params.build_references) {
         BUILD_REFERENCES()
     } else {
-
         GMO()
 
         multiqc_report = multiqc_report.mix(GMO.out.qc).toList()

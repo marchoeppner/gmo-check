@@ -1,7 +1,6 @@
 process JSON_TO_XLSX {
-
     tag 'All'
-    
+
     publishDir "${params.outdir}/Reports", mode: 'copy'
 
     input:
@@ -12,8 +11,8 @@ process JSON_TO_XLSX {
     //path(delimited), emit: csv
 
     script:
-    excel = params.run_name + ".xlsx"
-    delimited = params.run_name + ".csv"
+    excel = params.run_name + '.xlsx'
+    delimited = params.run_name + '.csv'
 
     """
     reports_to_xls.rb --outfile $excel

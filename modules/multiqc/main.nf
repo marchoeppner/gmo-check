@@ -10,14 +10,16 @@ process MULTIQC {
     path('*')
 
     output:
-    path('multiqc_report.html'), emit: html
+    path('*multiqc_report.html'), emit: html
     path("versions.yml"), emit: versions
 
     script:
 
     """
+    cp ${baseDir}/assets/pipelinelogo.png .
+    cp $baseDir/conf/multiqc_config.yaml multiqc_config.yaml
 
-    multiqc .
+    multiqc -n ${params.run_name}_multiqc_report .
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
