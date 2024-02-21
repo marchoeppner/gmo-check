@@ -13,13 +13,14 @@ process FREEBAYES {
     input:
     tuple val(meta), path(bam), path(bai)
     tuple path(fasta),path(fai),path(dict)
+    path(target_bed)
 
     output:
     tuple val(meta), path(vcf), emit: vcf
     path("versions.yml"), emit: versions
 
     script:
-    vcf = meta.sample_id + '.vcf'
+    vcf = meta.sample_id + '.freebayes.vcf'
 
     """
     freebayes -f $fasta \
@@ -28,6 +29,7 @@ process FREEBAYES {
         --min-alternate-count ${params.freebayes_min_alternate_count} \
         --min-alternate-fraction ${params.freebayes_min_alternate_frac} \
         -C 500 \
+        -t $target_bed \
         $bam > $vcf
 
     cat <<-END_VERSIONS > versions.yml

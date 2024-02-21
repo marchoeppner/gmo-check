@@ -4,7 +4,7 @@ process SAMTOOLS_DICT {
         'https://depot.galaxyproject.org/singularity/samtools:1.19.2--h50ea8bc_0' :
         'quay.io/biocontainers/samtools:1.19.2--h50ea8bc_0' }"
 
-    publishDir "${params.outdir}/SAMTOOLS", mode: 'copy'
+    publishDir "${params.outdir}/${meta.genome}", mode 'copy'
 
     tag "${fasta}"
 

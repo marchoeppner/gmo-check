@@ -1,33 +1,27 @@
+
 include { BWAMEM2_INDEX }       from "./../modules/bwamem2/index"
+include { SAMTOOLS_FAIDX }      from "./../modules/samtools/faidx"
+include { SAMTOOLS_DICT }       from "./../modules/samtools/dict"
 include { GUNZIP }              from "./../modules/gunzip"
+
+genomes = params.references.genomes.keySet()
+
+genome_list = []
+
+genomes.each { genome ->
+    def meta = [:]
+    meta.name = genome.toString()
+
+    genome_list << tuple(meta,file(params.references.genomes[genome].url, checkIfExists: true ))
+}
+
+ch_genomes = Channel.fromList(genome_list)
 
 workflow BUILD_REFERENCES {
 
-    genomes         = params.references.genomes.keys
-    genome_list     = []
+    main:
 
-    genomes.each { genome -> 
-        genomes_list << Channel.fromPath([ 
-            [ genome: genome ],
-            params.references.genomes[genome].url) 
-        ]
-    }
-    
-    ch_genomes      = Channel.fromList(genomes_list)
-
-    ch_genomes.branch {
-        compressed: it[1].contains(".gz")
-        uncompressed: !it[1].contains(".gz")
-    }.set { genomes_branched }
-
-    GUNZIP(
-        genomes_branched.compressed
+    SAMTOOLS_FAIDX(
+        ch_genomes
     )
-
-    ch_fasta        = genomes_branched.uncompressed.mix(GUNZIP.out.uncompressed)
-
-    BWAMEM2_INDEX(
-        ch_fasta
-    )
-
 }

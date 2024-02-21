@@ -1,8 +1,10 @@
 process GUNZIP {
 
-    tag "${zipped}"
+    tag "${meta.genome}"
 
     label 'medium_serial'
+
+    publishDir "${params.outdir}/${meta.genome}", mode: 'copy'
 
     conda 'sed=4.7'
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
@@ -10,10 +12,10 @@ process GUNZIP {
         'nf-core/ubuntu:20.04' }"
 
     input:
-    path(zipped)
+    tuple val(meta),path(zipped)
 
     output:
-    path(unzipped), emit: uncompressed
+    tuple val(meta),path(unzipped), emit: gunzip
     path("versions.yml"), emit: versions
 
     script:

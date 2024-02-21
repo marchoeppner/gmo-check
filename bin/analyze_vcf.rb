@@ -72,6 +72,7 @@ opts.banner = "Reads Fastq files from a folder and writes a sample sheet to STDO
 opts.separator ""
 opts.on("-v","--vcf", "=VCF","VCF to read") {|argument| options.vcf = argument }
 opts.on("-j","--json", "=JSON","JSON to read") {|argument| options.json = argument }
+opts.on("-s","--sample", "=SAMPLE","Sample name") {|argument| options.sample = argument }
 opts.on("-h","--help","Display the usage information") {
     puts opts
     exit
@@ -81,43 +82,58 @@ opts.parse!
 
 date = Time.now.strftime("%Y-%m-%d")
 
+result = { "sample" => options.sample, "matches" => [] }
+
 json = JSON.parse(IO.readlines(options.json).join)
 
 rules = json["rules"]["bwa-freebayes"]["payload"]
 
 vcf = parse_vcf(options.vcf)
 
-vcf.each do |entry|
+rules.each do  |rule|
+    
+    this_match = {}
 
-    allele = entry.allele_string
-
-    sample_name = entry.sample_names[0]
-    puts ">>>" + sample_name + "<<<"
+    rule_name = rule["name"]
+    rule_string = rule["matcher"]
 
     has_matched = false
 
-    rules.each do |rule|
-        string = rule["matcher"]
-        if string == allele
+    vcf.each do |entry|
+        
+        allele_string = entry.allele_string
+        this_sample = entry.samples[0]
+
+        # A match, presumably
+        if rule_string == allele_string
+
             has_matched = true
-            
-            puts rule["yields"]
-            sample = entry.samples[0]
-            genotype = sample["GT"]
+
+            this_match["rule"] = rule_name
+            this_match["Befund"] = rule["positive_report"]
+
+            genotype = this_sample["GT"]
+
             if genotype == "0/0"
-                puts "Varianten Frequenz unter Detektierungsschwelle!"
+                this_match["Anmerkung"] = "Variantenfrequenz unter Call-Schwelle!"
             end
-            rcov,acov = sample["AD"].split(",")
-            perc = (acov.to_f / rcov.to_f)*100.0
-            puts "\tGenotyp: #{sample["GT"]}\tAnteil: #{perc.round(2)}%\tRef: #{rcov}\tAlt: #{acov}\t"
+
+            rcov,acov = this_sample["AD"].split(",")
+            cov_sum = acov.to_i + rcov.to_i
+            perc = (acov.to_f / cov_sum.to_f)*100.0
+            this_match["Anteil Variante %"] = perc.round(2)
+            this_match["Abdeckung Referenzallel"] = rcov
+            this_match["Abdeckung Variantenallel"] = acov
+
+            result["matches"] << this_match
 
         end
     end
-    
-    if !has_matched
-        puts "Keine GABA Mutation nachgewiesen!"
+
+    unless has_matched
+        result["matches"] << { "rule" => rule_name, "Befund" => rule["negative_report"]}
     end
 
-    puts "==============================================================================="
-
 end
+
+puts result.to_json
