@@ -1,6 +1,6 @@
 process PTRIMMER {
 
-    publishDir "${params.outdir}/${meta.sample_id}/PTRIMMER", mode: 'copy'
+    publishDir "${params.outdir}/${meta.sample_id}/VSEARCH/PTRIMMER", mode: 'copy'
 
     label 'short_serial'
 

@@ -1,10 +1,10 @@
 process GUNZIP {
 
-    tag "${meta.genome}"
+    tag "${meta.id}"
 
     label 'medium_serial'
 
-    publishDir "${params.outdir}/${meta.genome}", mode: 'copy'
+    publishDir "${params.outdir}/${meta.id}", mode: 'copy'
 
     conda 'sed=4.7'
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?

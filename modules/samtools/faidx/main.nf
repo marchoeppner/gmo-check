@@ -1,6 +1,10 @@
 process SAMTOOLS_FAIDX {
 
-    publishDir "${params.outdir}/${meta.name}", mode 'copy'
+    tag "${meta.id}"
+
+    label 'short_serial'
+
+    publishDir "${params.outdir}/${meta.id}", mode 'copy'
 
     conda 'bioconda::samtools=1.19.2'
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?

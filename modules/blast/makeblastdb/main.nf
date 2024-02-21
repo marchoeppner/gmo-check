@@ -1,7 +1,7 @@
 process BLAST_MAKEBLASTDB {
     tag "$fasta"
 
-    publishDir "${params.outdir}/BlastDB", mode: 'copy'
+    publishDir "${params.outdir}/Processing/BlastDB", mode: 'copy'
 
     label 'short_parallel'
 

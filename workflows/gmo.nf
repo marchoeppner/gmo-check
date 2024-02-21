@@ -41,7 +41,7 @@ workflow GMO {
     ch_versions = ch_versions.mix(BIOBLOOMTOOLS_CATEGORIZER.out.versions)
     multiqc_files = multiqc_files.mix(BIOBLOOMTOOLS_CATEGORIZER.out.results)
 
-    // trim reads using fastP in automatic mode
+    // trim reads using fastP in automatic mode and with overlap correction
     FASTP(
         BIOBLOOMTOOLS_CATEGORIZER.out.reads
     )

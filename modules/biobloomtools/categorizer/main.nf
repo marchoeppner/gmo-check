@@ -1,6 +1,6 @@
 process BIOBLOOMTOOLS_CATEGORIZER {
 
-    publishDir "${params.outdir}/Bloomfilter", mode: 'copy'
+    publishDir "${params.outdir}/Processing/Bloomfilter", mode: 'copy'
 
     label 'short_parallel'
 

@@ -1,5 +1,5 @@
 process FASTP {
-    publishDir "${params.outdir}/FastP", mode: 'copy'
+    publishDir "${params.outdir}/Processing/FastP", mode: 'copy'
 
     label 'short_parallel'
 
