@@ -73,3 +73,9 @@ The location of where the pipeline references are installed on your system. This
 ## `--outdir results` [default = results]
 
 The location where the results are stored. Usually this will be `results`in the location from where you run the nextflow process. However, this option also accepts any other path in your file system(s). 
+
+## `--freebayes_min_alternate_count 50` [ default = 50]
+The minimum number of reads to support a given SNP. Since we are working with amplicon data, this value can be fairly high. 
+
+## `--freebayes_min_alternate_frac 0.01` [ default = 0.01]
+The minimum percentage of reads supporting a SNP at a given site for the SNP to be considered. The default of 1% is chosen to be able to detect low levels of contribution but may need some tweaking depending on your exact sequencing setup and coverage. 

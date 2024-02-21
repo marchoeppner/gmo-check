@@ -5,7 +5,7 @@
 This pipeline requires locally stored genomes in fasta format. To build these, do:
 
 ```
-nextflow run marchoeppner/gmo-check -profile standard,singularity --run_name build_refs --outdir /path/to/references
+nextflow run marchoeppner/gmo-check -profile standard,singularity --build_references --run_name build_refs --outdir /path/to/references
 ```
 
 If you do not have singularity on your system, you can also specify docker, podman or conda for software provisioning - see the [usage information](usage.md).
