@@ -31,7 +31,7 @@ workflow BWAMEM2_WORKFLOW {
 
     // Group BAM files by sample, in case of multi-lane setup
     bam_mapped = BWAMEM2_MEM.out.bam.map { meta, bam ->
-        newMmeta = [:]
+        newMeta = [:]
         newMeta.sample_id = meta.sample_id
         def groupKey = meta.sample_id
         tuple(groupKey, newMeta, bam)

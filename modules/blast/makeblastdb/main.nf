@@ -19,7 +19,7 @@ process BLAST_MAKEBLASTDB {
 
     script:
     def isCompressed = fasta.getExtension() == 'gz' ? true : false
-    def fastaName = is_compressed ? fasta.getBaseName() : fasta
+    def fastaName = isCompressed ? fasta.getBaseName() : fasta
 
     """
     if [ "${isCompressed}" == "true" ]; then
