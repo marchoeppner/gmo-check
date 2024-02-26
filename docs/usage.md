@@ -1,5 +1,7 @@
 # Usage information
 
+This is not a full release. Please note that some things may not work as intended yet. 
+
 # Running the pipeline
 
 A basic execution of the pipeline looks as follows:
@@ -65,6 +67,8 @@ This pipeline supports two completely independent tool chains:
 - `bwa2` uses a classic variant calling approach, with parameters similar to what one would find in cancer analysis to detect low-frequency SNPs in mixed samples. 
 
 You can specify either one, or both: `--tools 'vsearch,bwa2'` 
+
+Which tool chain is the best choice? Well, technically both options give near-identical results. So in this case `vsearch` would be the better option since it runs significantly faster. However, this pipeline is designed to (theoretically) handle many more types of genetic variants, not all of which are necessarily detectable without a proper variant calling. This is why the `bwa2` option exists - future proofing. 
 
 ## `--reference_base` [default = null ]
 

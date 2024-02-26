@@ -88,7 +88,7 @@ rules.each do |rule|
         perc = (carrier_cov.to_f / total_cov.to_f) * 100
         output["matches"] << { "rule" => rule_name , "toolchain" => "vsearch", "result" => rule["positive_report"], "perc_gmo" => perc.round(2), "ref_cov" => total_cov-carrier_cov, "alt_cov" => carrier_cov }
     else
-        output["matches"] << { "rule" => rule_name , "toolchain" => "vsearch", "result" => rule["negative_report"] }
+        output["matches"] << { "rule" => rule_name , "toolchain" => "vsearch", "result" => rule["negative_report"], "ref_cov" => total_cov, "alt_cov" => "NA" }
     end
 
 end

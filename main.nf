@@ -48,6 +48,10 @@ workflow.onComplete {
     log.info "Duration: $workflow.duration"
     log.info hline
 
+    summary["BlastDB"]                  = params.blastdb
+    summary["Freebayes_min_alt_frac"]   = params.freebayes_min_alternate_frac
+    summary["Freebayes_min_alt_count"]  = params.freebayes_min_alternate_count
+
     emailFields = [:]
     emailFields['version'] = workflow.manifest.version
     emailFields['session'] = workflow.sessionId

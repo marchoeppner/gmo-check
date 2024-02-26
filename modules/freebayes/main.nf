@@ -28,8 +28,8 @@ process FREEBAYES {
         --pooled-continuous \
         --min-alternate-count ${params.freebayes_min_alternate_count} \
         --min-alternate-fraction ${params.freebayes_min_alternate_frac} \
-        -C 500 \
         -t $target_bed \
+        --report-monomorphic \
         $bam > $vcf
 
     cat <<-END_VERSIONS > versions.yml

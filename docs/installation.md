@@ -1,5 +1,13 @@
 # Installation
 
+This is not a full release. Please note that some things may not work as intended yet. 
+Specifically: While most processes will use containers or conda environments as requested, the final reporting steps currently require locally:
+
+- ruby v >= 3.0
+- gems: json, rubyXL
+
+This will be corrected towards the full 1.0 release. 
+
 ## Installing the references
 
 This pipeline requires locally stored genomes in fasta format. To build these, do:
@@ -11,6 +19,7 @@ nextflow run marchoeppner/gmo-check -profile standard,singularity --build_refere
 If you do not have singularity on your system, you can also specify docker, podman or conda for software provisioning - see the [usage information](usage.md).
 
 The path specified with `--outdir` can then be given to the pipeline during normal execution as `--reference_base`.
+
 
 ## Site-specific config file
 

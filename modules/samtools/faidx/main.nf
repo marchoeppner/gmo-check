@@ -18,7 +18,7 @@ process SAMTOOLS_FAIDX {
     path("versions.yml"), emit: versions
 
     script:
-    idx = fasta.getSimpleName() + '.fai'
+    idx = fasta.getName() + '.fai'
 
     """
     samtools faidx $fasta > $idx
