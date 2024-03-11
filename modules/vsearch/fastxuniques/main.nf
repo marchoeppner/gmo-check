@@ -19,11 +19,14 @@ process VSEARCH_FASTXUNIQUES {
     derep = fa.getBaseName() + '.unique.fasta'
 
     """
-    vsearch -fastx_uniques $fa -sizeout -relabel ${meta.sample_id}_Unique -fastaout $derep
+    vsearch -fastx_uniques $fa \
+    -sizeout -relabel ${meta.sample_id}_Unique \
+    -fastaout $derep \
+    --threads ${task.cpus} \
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        vsearch: \$(vsearch --version 2>&1 | head -n1 | sed -e "s/vsearch //g" -e "s/,.*//")
+        vsearch: \$(vsearch --version 2>&1 | head -n 1 | sed 's/vsearch //g' | sed 's/,.*//g' | sed 's/^v//' | sed 's/_.*//')
     END_VERSIONS
     """
 }

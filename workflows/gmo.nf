@@ -63,7 +63,7 @@ workflow GMO {
         ch_versions     = ch_versions.mix(BWAMEM2_WORKFLOW.out.versions)
         ch_reports      = ch_reports.mix(BWAMEM2_WORKFLOW.out.reports)
     }
-
+    
     // Merging and deduplication of amplicons combined with BlastN
     if ('vsearch' in tools) {
         BLAST_MAKEBLASTDB(

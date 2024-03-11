@@ -19,11 +19,15 @@ process VSEARCH_FASTQFILTER {
     filtered = fq.getBaseName() + '.filtered.fasta'
 
     """
-    vsearch -fastq_filter $fq -fastq_maxee 0.5 -relabel Filtered -fastaout $filtered
+    vsearch -fastq_filter $fq \
+    -fastq_maxee 0.5 \
+    --threads ${task.cpus} \
+    -relabel Filtered \
+    -fastaout $filtered
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        vsearch: \$(vsearch --version 2>&1 | head -n1  | sed -e "s/vsearch //g" -e "s/,.*//")
+        vsearch: \$(vsearch --version 2>&1 | head -n 1 | sed 's/vsearch //g' | sed 's/,.*//g' | sed 's/^v//' | sed 's/_.*//')
     END_VERSIONS
     """
 }
