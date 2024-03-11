@@ -1,5 +1,4 @@
 process RULES_TO_BED {
-
     input:
     path(json)
 
@@ -7,10 +6,9 @@ process RULES_TO_BED {
     path(bed), emit: bed
 
     script:
-    bed = "rules.txt"
+    bed = 'rules.txt'
 
     """
     rules_to_bed.rb --json $json > $bed
     """
-
 }

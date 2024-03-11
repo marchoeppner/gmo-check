@@ -16,6 +16,9 @@ class WorkflowPipeline {
             log.info 'Cannot run the alignment workflow without genome references (--reference_base). Please check the documentation!'
             System.exit(1)
         }
+        if ( !params.input && !params.build_references) {
+            log.info "This pipeline requires a sample sheet as input (--input)"
+            System.exit(1)
+        }
     }
-
 }

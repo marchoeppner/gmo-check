@@ -1,5 +1,4 @@
 process BEDTOOLS_COVERAGE {
-    publishDir "${params.outdir}/${meta.sample_id}/BEDTOOLS", mode: 'copy'
 
     label 'short_parallel'
 
@@ -11,7 +10,7 @@ process BEDTOOLS_COVERAGE {
         'quay.io/biocontainers/bedtools:2.31.1--hf5e1c6e_0' }"
 
     input:
-    tuple val(meta),path(bam),path(bai)
+    tuple val(meta), path(bam), path(bai)
     path(bed)
 
     output:
@@ -19,8 +18,8 @@ process BEDTOOLS_COVERAGE {
     path('versions.yml'), emit: versions
 
     script:
-    coverage = meta.sample_id + ".bedcov.txt"
-    
+    coverage = meta.sample_id + '.bedcov.txt'
+
     """
     coverageBed -a $bed -b $bam > $coverage
 

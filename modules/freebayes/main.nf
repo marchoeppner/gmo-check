@@ -1,8 +1,6 @@
 process FREEBAYES {
     tag "${meta.sample_id}"
 
-    publishDir "${params.outdir}/Processing/Freebayes", mode: 'copy'
-
     label 'medium_serial'
 
     conda 'bioconda::freebayes=1.3.6'

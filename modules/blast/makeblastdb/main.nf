@@ -1,8 +1,6 @@
 process BLAST_MAKEBLASTDB {
     tag "$fasta"
 
-    publishDir "${params.outdir}/Processing/BlastDB", mode: 'copy'
-
     label 'short_parallel'
 
     conda 'bioconda::blast=2.15'

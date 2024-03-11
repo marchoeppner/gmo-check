@@ -49,4 +49,4 @@ workflow BUILD_REFERENCES {
     BWAMEM2_INDEX(
         ch_fasta
     )
-}
+    }

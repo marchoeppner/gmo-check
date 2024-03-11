@@ -8,7 +8,7 @@ process SAMTOOLS_FAIDX {
         'https://depot.galaxyproject.org/singularity/samtools:1.19.2--h50ea8bc_0' :
         'quay.io/biocontainers/samtools:1.19.2--h50ea8bc_0' }"
 
-    publishDir "${params.outdir}/${meta.id}", mode: 'copy'
+    publishDir "${params.outdir}/gmo-check/${meta.id}", mode: 'copy'
 
     input:
     tuple val(meta), path(fasta)

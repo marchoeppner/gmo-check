@@ -2,16 +2,15 @@
 
 nextflow.enable.dsl = 2
 
-// TODO: Update this block with a description and the name of the pipeline
 /**
 ===============================
-Pipeline
+GMO-check Pipeline
 ===============================
 
-This Pipeline performs ....
+This Pipeline performs detection of genetic events in food and seed material(s) (GMO analysis).
 
 ### Homepage / git
-git@github.com:marchoeppner/pipeline.git
+git@github.com:marchoeppner/gmo-check.git
 
 **/
 
@@ -24,7 +23,6 @@ run_name = (params.run_name == false) ? "${workflow.sessionId}" : "${params.run_
 
 WorkflowMain.initialise(workflow, params, log)
 
-// TODO: Rename this and the file under lib/ to something matching this pipeline (e.g. WorkflowAmplicons)
 WorkflowPipeline.initialise(params, log)
 
 include { GMO }                 from './workflows/gmo'
@@ -48,9 +46,9 @@ workflow.onComplete {
     log.info "Duration: $workflow.duration"
     log.info hline
 
-    summary["BlastDB"]                  = params.blastdb
-    summary["Freebayes_min_alt_frac"]   = params.freebayes_min_alternate_frac
-    summary["Freebayes_min_alt_count"]  = params.freebayes_min_alternate_count
+    summary['BlastDB']                  = params.blastdb
+    summary['Freebayes_min_alt_frac']   = params.freebayes_min_alternate_frac
+    summary['Freebayes_min_alt_count']  = params.freebayes_min_alternate_count
 
     emailFields = [:]
     emailFields['version'] = workflow.manifest.version

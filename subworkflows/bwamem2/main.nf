@@ -95,4 +95,4 @@ workflow BWAMEM2_WORKFLOW {
     vcf         = FREEBAYES.out.vcf
     reports     = ch_reports
     bam         = SAMTOOLS_AMPLICONCLIP.out.bam
-}
+    }

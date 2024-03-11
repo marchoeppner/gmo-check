@@ -4,7 +4,7 @@ process VCF_TO_REPORT {
     publishDir "${params.outdir}/Reports/JSON", mode: 'copy'
 
     input:
-    tuple val(meta),path(vcf),path(coverage)
+    tuple val(meta), path(vcf), path(coverage)
     path(rules)
 
     output:
