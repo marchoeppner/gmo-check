@@ -1,5 +1,4 @@
 process BLAST_BLASTN {
-    publishDir "${params.outdir}/Processing/BlastN", mode: 'copy'
 
     label 'short_parallel'
 

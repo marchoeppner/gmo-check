@@ -17,7 +17,7 @@
             "payload": [
                 {
                     "format": "VCF",
-                    "target": "1:14834",
+                    "target": "1:14834-14836",
                     "name": "GABA Mutation in SIGAD3",
                     "matcher": "1\t14834\t.\tGTG\tGTTG",
                     "positive_report": "Diese Probe enthält eine GABA Mutation in SIGAD3. Nachweis erbracht über: Varianten Analyse.",

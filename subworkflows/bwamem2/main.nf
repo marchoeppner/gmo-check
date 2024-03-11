@@ -5,6 +5,8 @@ include { SAMTOOLS_INDEX }          from './../../modules/samtools/index'
 include { SAMTOOLS_AMPLICONCLIP }   from './../../modules/samtools/ampliconclip'
 include { FREEBAYES }               from './../../modules/freebayes'
 include { VCF_TO_REPORT }           from './../../modules/helper/vcf_to_report'
+include { RULES_TO_BED }            from './../../modules/helper/rules_to_bed'
+include { BEDTOOLS_COVERAGE }       from './../../modules/bedtools/coverage'
 
 ch_versions = Channel.from([])
 ch_qc       = Channel.from([])
@@ -16,9 +18,14 @@ workflow BWAMEM2_WORKFLOW {
     fasta
     bed
     rules
-    targets
 
     main:
+
+    // Convert the rules to a list of regions
+    RULES_TO_BED(
+        rules
+    )
+    ch_bed = RULES_TO_BED.out.bed.collect()
 
     // read alignment with BWA2
     // This already includes sorting and fixing mate information
@@ -54,7 +61,7 @@ workflow BWAMEM2_WORKFLOW {
     // Mask out primer binding sites
     SAMTOOLS_AMPLICONCLIP(
         SAMTOOLS_INDEX.out.bam,
-        bed
+        ch_bed
     )
     ch_versions = ch_versions.mix(SAMTOOLS_AMPLICONCLIP.out.versions)
 
@@ -62,20 +69,30 @@ workflow BWAMEM2_WORKFLOW {
     FREEBAYES(
         SAMTOOLS_AMPLICONCLIP.out.bam,
         fasta,
-        targets
+        ch_bed
     )
     ch_versions = ch_versions.mix(FREEBAYES.out.versions)
 
+    // Get coverage or target region(s)
+    BEDTOOLS_COVERAGE(
+        SAMTOOLS_AMPLICONCLIP.out.bam,
+        ch_bed
+    )
+
+    ch_variants_with_cov = FREEBAYES.out.vcf.join(BEDTOOLS_COVERAGE.out.report)
+
+    // Obtain results from VCF file using rules
     VCF_TO_REPORT(
-        FREEBAYES.out.vcf,
+        ch_variants_with_cov,
         rules
     )
 
     ch_reports = ch_reports.mix(VCF_TO_REPORT.out.json)
 
     emit:
-    qc = ch_qc
-    versions = ch_versions
-    vcf = FREEBAYES.out.vcf
-    reports = ch_reports
+    qc          = ch_qc
+    versions    = ch_versions
+    vcf         = FREEBAYES.out.vcf
+    reports     = ch_reports
+    bam         = SAMTOOLS_AMPLICONCLIP.out.bam
     }

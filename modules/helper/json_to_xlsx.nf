@@ -8,13 +8,11 @@ process JSON_TO_XLSX {
 
     output:
     path(excel), emit: xlsx
-    //path(delimited), emit: csv
 
     script:
     excel = params.run_name + '.xlsx'
-    delimited = params.run_name + '.csv'
 
     """
-    reports_to_xls.rb --outfile $excel
+    reports_to_xls_v2.rb --outfile $excel
     """
 }

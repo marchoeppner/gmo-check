@@ -72,6 +72,7 @@ opts.banner = "Reads Fastq files from a folder and writes a sample sheet to STDO
 opts.separator ""
 opts.on("-v","--vcf", "=VCF","VCF to read") {|argument| options.vcf = argument }
 opts.on("-j","--json", "=JSON","JSON to read") {|argument| options.json = argument }
+opts.on("-c","--coverage", "=COVERAGE","BAM coverage") {|argument| options.coverage = argument }
 opts.on("-s","--sample", "=SAMPLE","Sample name") {|argument| options.sample = argument }
 opts.on("-h","--help","Display the usage information") {
     puts opts
@@ -81,6 +82,14 @@ opts.on("-h","--help","Display the usage information") {
 opts.parse! 
 
 date = Time.now.strftime("%Y-%m-%d")
+
+coverages = {}
+cov_lines = IO.readlines(options.coverage)
+cov_lines.each do |cl|
+    # 1	14834	14836	GABA Mutation in SIGAD3	1332221	2	2	1.0000000
+    seq,from,to,name,cov,la,lb,frac = cl.split("\t")
+    coverages[name] = cov.to_i
+end
 
 result = { "sample" => options.sample, "matches" => [] }
 
@@ -95,7 +104,9 @@ rules.each do  |rule|
     rule_name = rule["name"]
     rule_string = rule["matcher"]
 
-    this_match = { "toolchain" => "bwa2" , "rule" => rule_name}
+    coverages.has_key?(rule_name) ? this_cov = coverages[rule_name] : this_cov = "NA"
+
+    this_match = { "toolchain" => "bwa2" , "rule" => rule_name, "bam_cov" => this_cov }
 
     has_matched = false
 
@@ -120,6 +131,7 @@ rules.each do  |rule|
             rcov,acov = this_sample["AD"].split(",")
             cov_sum = acov.to_i + rcov.to_i
             perc = (acov.to_f / cov_sum.to_f)*100.0
+            
             this_match["perc_gmo"] = perc.round(2)
             this_match["ref_cov"] = rcov
             this_match["alt_cov"] = acov
@@ -131,6 +143,9 @@ rules.each do  |rule|
 
     unless has_matched
         this_match["report"] = rule["negative_report"]
+        this_match["ref_cov"] = "NA"
+        this_match["alt_cov"] = "NA"
+        this_match["perc_gmo"] = 0.0
         result["matches"] << this_match
     end
 

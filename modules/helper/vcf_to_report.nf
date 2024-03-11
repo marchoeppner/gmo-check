@@ -4,7 +4,7 @@ process VCF_TO_REPORT {
     publishDir "${params.outdir}/Reports/JSON", mode: 'copy'
 
     input:
-    tuple val(meta), path(vcf)
+    tuple val(meta), path(vcf), path(coverage)
     path(rules)
 
     output:
@@ -14,6 +14,6 @@ process VCF_TO_REPORT {
     report = vcf.getBaseName() + '.report.json'
 
     """
-    analyze_vcf.rb -v $vcf -j $rules -s ${meta.sample_id} > $report
+    analyze_vcf.rb -v $vcf -j $rules -c $coverage -s ${meta.sample_id} > $report
     """
 }

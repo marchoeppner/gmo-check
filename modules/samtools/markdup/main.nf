@@ -8,8 +8,6 @@ process SAMTOOLS_MARKDUP {
 
     tag "${meta.sample_id}"
 
-    publishDir "${params.outdir}/${meta.sample_id}/", mode: 'copy'
-
     input:
     tuple val(meta), path(merged_bam), path(merged_bam_index)
 

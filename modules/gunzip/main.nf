@@ -3,7 +3,7 @@ process GUNZIP {
 
     label 'medium_serial'
 
-    publishDir "${params.outdir}/${meta.id}", mode: 'copy'
+    publishDir "${params.outdir}/gmo-check/${meta.id}", mode: 'copy'
 
     conda 'sed=4.7'
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?

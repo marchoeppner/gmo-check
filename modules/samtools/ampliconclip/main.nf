@@ -6,8 +6,6 @@ process SAMTOOLS_AMPLICONCLIP {
 
     tag "${meta.sample_id}"
 
-    publishDir "${params.outdir}/${meta.sample_id}/BWA2", mode: 'copy'
-
     input:
     tuple val(meta), path(bam), path(bai)
     path(bed)

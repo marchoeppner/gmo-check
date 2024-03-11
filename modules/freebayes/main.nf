@@ -1,8 +1,6 @@
 process FREEBAYES {
     tag "${meta.sample_id}"
 
-    publishDir "${params.outdir}/Processing/Freebayes", mode: 'copy'
-
     label 'medium_serial'
 
     conda 'bioconda::freebayes=1.3.6'
@@ -28,8 +26,8 @@ process FREEBAYES {
         --pooled-continuous \
         --min-alternate-count ${params.freebayes_min_alternate_count} \
         --min-alternate-fraction ${params.freebayes_min_alternate_frac} \
-        -C 500 \
         -t $target_bed \
+        --report-monomorphic \
         $bam > $vcf
 
     cat <<-END_VERSIONS > versions.yml

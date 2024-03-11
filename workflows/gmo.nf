@@ -17,7 +17,7 @@ dict            = params.references.genomes[params.genome].dict                 
 references      = [ fasta, fai, dict ]
 
 ch_bed          = Channel.fromPath(params.references.genomes[params.genome].bed).collect()           // Bed file with primer locations
-ch_targets      = Channel.fromPath(params.references.genomes[params.genome].target_bed).collect()    // Bed file with calling regions
+//ch_targets      = Channel.fromPath(params.references.genomes[params.genome].target_bed).collect()    // Bed file with calling regions
 ch_amplicon_txt = Channel.fromPath(params.references.genomes[params.genome].amplicon_txt).collect()  // The ptrimmer primer manifest
 ch_rules        = Channel.fromPath(params.references.genomes[params.genome].rules).collect()         // rules to define what we consider a hit
 
@@ -57,8 +57,7 @@ workflow GMO {
             FASTP.out.reads,
             references,
             ch_bed,
-            ch_rules,
-            ch_targets
+            ch_rules
         )
         multiqc_files   = multiqc_files.mix(BWAMEM2_WORKFLOW.out.qc)
         ch_versions     = ch_versions.mix(BWAMEM2_WORKFLOW.out.versions)

@@ -6,7 +6,7 @@ process BWAMEM2_INDEX {
     conda 'bioconda::samtools=1.19.2 bioconda::bwa-mem2=2.2.1'
     container 'quay.io/biocontainers/mulled-v2-e5d375990341c5aef3c9aff74f96f66f65375ef6:2cdf6bf1e92acbeb9b2834b1c58754167173a410-0'
 
-    publishDir "${params.outdir}/${meta.id}", mode: 'copy'
+    publishDir "${params.outdir}/gmo-check/${meta.id}", mode: 'copy'
 
     input:
     tuple val(meta), path(fasta)
