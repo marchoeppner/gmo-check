@@ -6,7 +6,7 @@ Specifically: While most processes will use containers or conda environments as 
 - ruby v >= 3.0
 - gems: json, rubyXL
 
-This will be corrected towards the full 1.0 release. 
+This will be corrected towards the full 1.0 release, at which point the pipeline will be fully platform-independent and self-contained. 
 
 ## Installing the references
 

@@ -15,6 +15,8 @@ where `path_to_references` corresponds to the location in which you have [instal
 
 In this example, the pipeline will assume it runs on a single computer with the singularity container engine available. Other options to provision software are:
 
+`-profile standard,singularity`
+
 `-profile standard,docker` 
 
 `-profile standard,podman` 
