@@ -5,6 +5,7 @@ include { BLAST_BLASTN }            from './../../modules/blast/blastn'
 include { PTRIMMER }                from './../../modules/ptrimmer'
 include { BLAST_TO_REPORT }         from './../../modules/helper/blast_to_report'
 include { CAT_FASTQ }               from './../../modules/cat_fastq'
+
 ch_versions = Channel.from([])
 ch_reports  = Channel.from([])
 

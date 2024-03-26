@@ -1,15 +1,24 @@
-
+/*
+Modules to include
+*/
 include { INPUT_CHECK }                 from './../modules/input_check'
 include { FASTP }                       from './../modules/fastp'
 include { MULTIQC }                     from './../modules/multiqc'
 include { BLAST_MAKEBLASTDB }           from './../modules/blast/makeblastdb'
-include { VSEARCH_WORKFLOW }            from './../subworkflows/vsearch'
-include { BWAMEM2_WORKFLOW }            from './../subworkflows/bwamem2'
 include { BIOBLOOMTOOLS_CATEGORIZER }   from './../modules/biobloomtools/categorizer'
 include { JSON_TO_XLSX }                from './../modules/helper/json_to_xlsx'
 include { JSON_TO_MQC }                 from './../modules/helper/json_to_mqc'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from './../modules/custom/dumpsoftwareversions'
 
+/*
+Subworkflows to include
+*/
+include { VSEARCH_WORKFLOW }            from './../subworkflows/vsearch'
+include { BWAMEM2_WORKFLOW }            from './../subworkflows/bwamem2'
+
+/*
+Set default channels
+*/
 ch_db_file      = Channel.fromPath("${baseDir}/assets/blastdb.fasta.gz", checkIfExists: true)        // The built-in blast database
 fasta           = params.references.genomes[params.genome].fasta                                     // The reference genome to be used
 fai             = params.references.genomes[params.genome].fai                                       // The fasta index of the reference genome
@@ -17,11 +26,13 @@ dict            = params.references.genomes[params.genome].dict                 
 references      = [ fasta, fai, dict ]
 
 ch_bed          = Channel.fromPath(params.references.genomes[params.genome].bed).collect()           // Bed file with primer locations
-//ch_targets      = Channel.fromPath(params.references.genomes[params.genome].target_bed).collect()    // Bed file with calling regions
 ch_amplicon_txt = Channel.fromPath(params.references.genomes[params.genome].amplicon_txt).collect()  // The ptrimmer primer manifest
 ch_rules        = Channel.fromPath(params.references.genomes[params.genome].rules).collect()         // rules to define what we consider a hit
 
 samplesheet     = params.input ? Channel.fromPath(params.input) : Channel.value([])                  // the samplesheet with name and location of the sample(s)
+
+ch_multiqc_config = params.multiqc_config ? Channel.fromPath(params.multiqc_config, checkIfExists: true).collect()    : []
+ch_multiqc_logo   = params.multiqc_logo   ? Channel.fromPath(params.multiqc_logo, checkIfExists: true).collect()      : []
 
 ch_versions     = Channel.from([])
 multiqc_files   = Channel.from([])
@@ -51,7 +62,10 @@ workflow GMO {
     ch_versions = ch_versions.mix(FASTP.out.versions)
     multiqc_files = multiqc_files.mix(FASTP.out.json)
 
-    // Performing proper variant calling with BWA2 and Freebayes
+    /*
+    Perform alignment and variant calling
+    using BWA-MEM2 and Freebayes
+    */
     if ('bwa2' in tools) {
         BWAMEM2_WORKFLOW(
             FASTP.out.reads,
@@ -64,7 +78,10 @@ workflow GMO {
         ch_reports      = ch_reports.mix(BWAMEM2_WORKFLOW.out.reports)
     }
     
-    // Merging and deduplication of amplicons combined with BlastN
+    /*
+    Amplicon clustering and pattern-matching
+    against a BLAST database
+    */
     if ('vsearch' in tools) {
         BLAST_MAKEBLASTDB(
             ch_db_file
@@ -99,7 +116,9 @@ workflow GMO {
     multiqc_files = multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml)
 
     MULTIQC(
-        multiqc_files.collect()
+        multiqc_files.collect(),
+        ch_multiqc_config,
+        ch_multiqc_logo
     )
 
     emit:

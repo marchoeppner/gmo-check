@@ -1,3 +1,6 @@
+/*
+Modules to include
+*/
 include { GUNZIP }              from './../modules/gunzip'
 include { SAMTOOLS_FAIDX }      from './../modules/samtools/faidx'
 include { SAMTOOLS_DICT }       from './../modules/samtools/dict'

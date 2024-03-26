@@ -1,3 +1,6 @@
+/*
+Include modules
+*/
 include { BWAMEM2_MEM }             from './../../modules/bwamem2/mem'
 include { SAMTOOLS_MERGE }          from './../../modules/samtools/merge'
 include { SAMTOOLS_MARKDUP }        from './../../modules/samtools/markdup'
@@ -27,8 +30,9 @@ workflow BWAMEM2_WORKFLOW {
     )
     ch_bed = RULES_TO_BED.out.bed.collect()
 
-    // read alignment with BWA2
-    // This already includes sorting and fixing mate information
+    /*
+    Read alignment with integrated sorting and fixmate
+    */
     BWAMEM2_MEM(
         reads,
         fasta
@@ -72,7 +76,11 @@ workflow BWAMEM2_WORKFLOW {
     )
     ch_versions = ch_versions.mix(FREEBAYES.out.versions)
 
-    // Get coverage or target region(s)
+    /*
+    Get coverage of target region(s)
+    This is to ensure that we always have a coverage
+    even with the sample only contains wildtype, i.e. no variant calls
+    */
     BEDTOOLS_COVERAGE(
         SAMTOOLS_AMPLICONCLIP.out.bam,
         ch_bed

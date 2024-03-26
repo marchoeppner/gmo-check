@@ -145,3 +145,60 @@ You'll note that some obvious errors/warnings are omitted. This behavior is cont
 ## Sending report emails
 
 This template is set up to send the final QC report via Email (--email you@gmail.com). This requires for sendmail to be configured on the executing node/computer. 
+
+## Adding new genomes and targets
+
+This pipeline uses a JSON-formatted config file to keep track of the supported analyses. The most basic form looks as follows:
+
+```JSON
+{
+    "rules": {
+        "vsearch-blast": {
+            "payload": [
+                {
+                    "format": "JSON",
+                    "name": "GABA Mutation in SIGAD3",
+                    "target": "SiGAD3|NM_001246898.2",
+                    "matcher": "AAAG-TGGA",
+                    "positive_report": "Diese Probe enthält eine GABA Mutation in SIGAD3. Nachweis erbraucht über: Amplicon Analyse.",
+                    "negative_report": "Für diese Probe konnte keine GABA Mutation in SIGAD3 nachgewiesen werden."
+                }
+            ]
+            
+        },
+        "bwa-freebayes": {
+            "payload": [
+                {
+                    "format": "VCF",
+                    "target": "1:14834-14836",
+                    "name": "GABA Mutation in SIGAD3",
+                    "matcher": "1\t14834\t.\tGTG\tGTTG",
+                    "positive_report": "Diese Probe enthält eine GABA Mutation in SIGAD3. Nachweis erbracht über: Varianten Analyse.",
+                    "negative_report": "Für diese Probe konnte keine GABA Mutation in SIGAD3 nachgewiesen werden."
+                } 
+            ]
+        }
+    }
+}
+```
+
+This file is reference-genome specific and lives in `assets/genome/NAME_OF_SPECIES/rules.json` [example](../assets/genomes/tomato/rules.json)
+
+The rule set knows two types of rules:
+
+- `vsearch-blast` - for analyses that use assembled and clustered amplicons to find patterns in a BLAST database
+
+- `bwa-freebayes` - for analyses that use read alignment and variant calling against a reference genome. 
+
+To add new targets to an already established reference genome:
+
+- Add new elements to the appropriate payload block in the rules.json manifest, following the example structure above
+- If you want to enable the vsearch-blast tool chain, make sure that the built-in [Blast Database](../assets/blastdb.fasta.gz) contains the required target motif(s) (usually a gene of interest). 
+- Add the necessary primer information to the Ptrimmer config (amplicon.txt)
+- Add the primer sequences to the cutadapt fasta file (primers.fa)
+
+To add new reference genomes and matching target rules:
+
+- Add the necessary information about the new reference genome into the [resources.config](../conf/resources.config) file, including a download link. 
+- Create a new species folder under /assets/genome
+- Add the relevant files as described for above for adding individual assets
