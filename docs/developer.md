@@ -33,7 +33,6 @@ Some aspects of this code base are controlled by config files. These are:
 
 /conf/base.config - this file sets the computing specifications for different types of processes. 
 
-/conf/lsh.config - this is an example of a site-specific config file (set as "standard" profile in nextflow.config), in which you can provide information about your compute environment. Make sure to create a new profile for it too. 
 
 ## Groovy libraries
 
@@ -62,10 +61,6 @@ If mulling containers is not an option, you can also refer to github actions and
 ## Github workflows
 
 Github supports the automatic execution of specific tasks on code branches, such as the automatic linting of the code base or building and pushing of Docker containers. To add github workflows to your repository, place them into the sub-directory `.github/workflows`. 
-
-### Docker containers
-
-In order to automatically push Docker containers, you must add your docker username and API token as secrets to your repository (DOCKERHUB_USERNAME and DOCKERHUB_TOKEN). Secrets can be created under Settings/Secrets and Variables/Actions. Of course, you also need to have an account on Dockerhub and generate a permanent token.  The relevant workflow actions are included in `dot_github/workflows`. These will read the `Dockerfile` from the root of this repository, import environment.yml (if you wish to install conda packages into the container), build the whole thing and push the container to an appropriate dockerhub repository 
 
 ## How to start
 
@@ -140,11 +135,6 @@ npm-groovy-lint
 ```
 
 You'll note that some obvious errors/warnings are omitted. This behavior is controlled by the settings in .groovylintrc [documentation](https://www.npmjs.com/package/npm-groovy-lint), included with this template. If you need to switch on some stuff, just add it the config file - and vice-versa. 
-
-
-## Sending report emails
-
-This template is set up to send the final QC report via Email (--email you@gmail.com). This requires for sendmail to be configured on the executing node/computer. 
 
 ## Adding new genomes and targets
 

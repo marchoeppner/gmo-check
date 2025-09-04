@@ -6,23 +6,24 @@ include { SAMTOOLS_FAIDX }      from './../modules/samtools/faidx'
 include { SAMTOOLS_DICT }       from './../modules/samtools/dict'
 include { BWAMEM2_INDEX }       from './../modules/bwamem2/index'
 
-genomes = params.references.genomes.keySet()
-
-genome_list = []
-
-// Get all the configured genomes
-genomes.each { genome ->
-    def meta = [:]
-    meta.id = genome.toString()
-
-    genome_list << tuple(meta, file(params.references.genomes[genome].url, checkIfExists: true))
-}
-
-ch_genomes = Channel.fromList(genome_list)
 
 // Workflow starts here
 workflow BUILD_REFERENCES {
+
     main:
+
+    genomes = params.references.genomes.keySet()
+    genome_list = []
+
+    // Get all the configured genomes
+    genomes.each { genome ->
+        def meta = [:]
+        meta.id = genome.toString()
+
+        genome_list << tuple(meta, file(params.references.genomes[genome].url, checkIfExists: true))
+    }
+
+    ch_genomes = Channel.fromList(genome_list)
 
     // Check if any of the fasta files are gzipped
     ch_genomes.branch {

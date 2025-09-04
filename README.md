@@ -1,5 +1,11 @@
 # GMO-Check pipeline
 
+[![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A524.04.2-23aa62.svg)](https://www.nextflow.io/)
+[![run with conda](http://img.shields.io/badge/run%20with-conda-3EB049?labelColor=000000&logo=anaconda)](https://docs.conda.io/en/latest/)
+[![run with docker](https://img.shields.io/badge/run%20with-docker-0db7ed?labelColor=000000&logo=docker)](https://www.docker.com/)
+[![run with singularity](https://img.shields.io/badge/run%20with-singularity-1d355c.svg?labelColor=000000)](https://sylabs.io/docs/)
+[![run with apptainer](https://img.shields.io/badge/apptainer-run?logo=apptainer&logoColor=3EB049&label=run%20with&labelColor=000000)](https://apptainer.org/)
+
 This pipeline is being developed to detect GMO content from short-read (amplicon) data. Currently, only the detection of GABA mutations in tomato are supported. As this particular modification is characterized by a specific nucleotide insertion into the SIGAB3 gene, this is what the pipeline will currently try to check for. It does this by two independent approaches - classical variant calling on the one hand and the detection of the insertion in merged and dereplicated amplicon "ZOTUS" against a blast database containing the wild type gene sequence on the other. 
 
 The variant calling workflow will first align quality- and adapter trimmed reads against the tomato reference genome (v3.0). It then masks out bases that start and overlap with the curated primer site locations using samtools ampliconclip. No deduplication will be performed to enable the accurate determination of GMO content in mixed samples. Finally, the read alignment is analyzed with Freebayes to determine the presence of any diagnostically relevant variants. 

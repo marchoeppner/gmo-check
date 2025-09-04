@@ -16,34 +16,35 @@ Subworkflows to include
 include { VSEARCH_WORKFLOW }            from './../subworkflows/vsearch'
 include { BWAMEM2_WORKFLOW }            from './../subworkflows/bwamem2'
 
-/*
-Set default channels
-*/
-ch_db_file      = Channel.fromPath("${baseDir}/assets/blastdb.fasta.gz", checkIfExists: true)        // The built-in blast database
-fasta           = params.references.genomes[params.genome].fasta                                     // The reference genome to be used
-fai             = params.references.genomes[params.genome].fai                                       // The fasta index of the reference genome
-dict            = params.references.genomes[params.genome].dict                                      // The dictionary of the reference genome
-references      = [ fasta, fai, dict ]
-
-ch_bed          = Channel.fromPath(params.references.genomes[params.genome].bed).collect()           // Bed file with primer locations
-ch_amplicon_txt = Channel.fromPath(params.references.genomes[params.genome].amplicon_txt).collect()  // The ptrimmer primer manifest
-ch_rules        = Channel.fromPath(params.references.genomes[params.genome].rules).collect()         // rules to define what we consider a hit
-
-samplesheet     = params.input ? Channel.fromPath(params.input) : Channel.value([])                  // the samplesheet with name and location of the sample(s)
-
-ch_multiqc_config = params.multiqc_config ? Channel.fromPath(params.multiqc_config, checkIfExists: true).collect()    : []
-ch_multiqc_logo   = params.multiqc_logo   ? Channel.fromPath(params.multiqc_logo, checkIfExists: true).collect()      : []
-
-ch_versions     = Channel.from([])
-multiqc_files   = Channel.from([])
-ch_reports      = Channel.from([])
-
-// Capture list of requested tool chains
-tools = params.tools ? params.tools.split(',').collect { it.trim().toLowerCase().replaceAll('-', '').replaceAll('_', '') } : []
-
 // workflow starts here
 workflow GMO {
+
     main:
+
+    /*
+    Set default channels
+    */
+    ch_db_file      = Channel.fromPath("${baseDir}/assets/blastdb.fasta.gz", checkIfExists: true)        // The built-in blast database
+    fasta           = params.references.genomes[params.genome].fasta                                     // The reference genome to be used
+    fai             = params.references.genomes[params.genome].fai                                       // The fasta index of the reference genome
+    dict            = params.references.genomes[params.genome].dict                                      // The dictionary of the reference genome
+    references      = [ fasta, fai, dict ]
+
+    ch_bed          = Channel.fromPath(params.references.genomes[params.genome].bed).collect()           // Bed file with primer locations
+    ch_amplicon_txt = Channel.fromPath(params.references.genomes[params.genome].amplicon_txt).collect()  // The ptrimmer primer manifest
+    ch_rules        = Channel.fromPath(params.references.genomes[params.genome].rules).collect()         // rules to define what we consider a hit
+
+    samplesheet     = params.input ? Channel.fromPath(params.input) : Channel.value([])                  // the samplesheet with name and location of the sample(s)
+
+    ch_multiqc_config = params.multiqc_config ? Channel.fromPath(params.multiqc_config, checkIfExists: true).collect()    : []
+    ch_multiqc_logo   = params.multiqc_logo   ? Channel.fromPath(params.multiqc_logo, checkIfExists: true).collect()      : []
+
+    ch_versions     = Channel.from([])
+    multiqc_files   = Channel.from([])
+    ch_reports      = Channel.from([])
+
+    // Capture list of requested tool chains
+    tools = params.tools ? params.tools.split(',').collect { it.trim().toLowerCase().replaceAll('-', '').replaceAll('_', '') } : []
 
     // read the sample sheet and turn into channel with meta hash
     INPUT_CHECK(samplesheet)

@@ -6,10 +6,8 @@ include { PTRIMMER }                from './../../modules/ptrimmer'
 include { BLAST_TO_REPORT }         from './../../modules/helper/blast_to_report'
 include { CAT_FASTQ }               from './../../modules/cat_fastq'
 
-ch_versions = Channel.from([])
-ch_reports  = Channel.from([])
-
 workflow VSEARCH_WORKFLOW {
+
     take:
     reads
     db
@@ -17,6 +15,9 @@ workflow VSEARCH_WORKFLOW {
     rules
 
     main:
+
+    ch_versions = Channel.from([])
+    ch_reports  = Channel.from([])
 
     // Remove PCR adapter sites from reads
     PTRIMMER(
@@ -31,11 +32,11 @@ workflow VSEARCH_WORKFLOW {
         newMeta.sample_id = m.sample_id
         newMeta.single_end = m.single_end
         tuple(newMeta,r)
-    }.groupTuple().branch { meta, reads ->
-        single: reads.size() == 1
-            return [ meta, reads.flatten()]
-        multi: reads.size() > 1
-            return [ meta, reads.flatten()]
+    }.groupTuple().branch { meta, fastqs ->
+        single: fastqs.size() == 1
+            return [ meta, fastqs.flatten()]
+        multi: fastqs.size() > 1
+            return [ meta, fastqs.flatten()]
     }.set { ch_reads_trimmed }
 
     // Concatenate samples with multiple files (multi-lane)

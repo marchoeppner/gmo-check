@@ -11,10 +11,6 @@ include { VCF_TO_REPORT }           from './../../modules/helper/vcf_to_report'
 include { RULES_TO_BED }            from './../../modules/helper/rules_to_bed'
 include { BEDTOOLS_COVERAGE }       from './../../modules/bedtools/coverage'
 
-ch_versions = Channel.from([])
-ch_qc       = Channel.from([])
-ch_reports  = Channel.from([])
-
 workflow BWAMEM2_WORKFLOW {
     take:
     reads
@@ -23,6 +19,10 @@ workflow BWAMEM2_WORKFLOW {
     rules
 
     main:
+
+    ch_versions = Channel.from([])
+    ch_qc       = Channel.from([])
+    ch_reports  = Channel.from([])
 
     // Convert the rules to a list of regions
     RULES_TO_BED(
@@ -41,7 +41,7 @@ workflow BWAMEM2_WORKFLOW {
 
     // Group BAM files by sample, in case of multi-lane setup
     bam_mapped = BWAMEM2_MEM.out.bam.map { meta, bam ->
-        newMeta = [:]
+        def newMeta = [:]
         newMeta.sample_id = meta.sample_id
         def groupKey = meta.sample_id
         tuple(groupKey, newMeta, bam)

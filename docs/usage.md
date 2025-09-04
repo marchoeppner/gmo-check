@@ -47,10 +47,23 @@ In this example, both `--reference_base` and the choice of software provisioning
 This pipeline expects a CSV-formatted sample sheet to properly pull various meta data through the processes. The required format looks as follows:
 
 ```CSV
-sample_id,library_id,readgroup_id,single_end,R1,R2
-S100,S100,AACYTCLM5.1.S100,false,/home/marc/projects/gaba/data/S100_R1.fastq.gz,/home/marc/projects/gaba/data/S100_R2.fastq.gz
+sample,library_id,readgroup_id,R1,R2
+S100,S100,AACYTCLM5.1.S100,/home/marc/projects/gaba/data/S100_R1.fastq.gz,/home/marc/projects/gaba/data/S100_R2.fastq.gz
 ```
+
+| Column | Description |
+| ------ | ----------- |
+| sample | A unique identifier for this sample |
+| library_id | The name/id of a specific library (samples may have more than one library!) |
+| readgroup_id | A unique identifier for the combination of library, land and flow cell |
+| R1 | The full path to the forward reads |
+| R2 | The full path to the reverse reads |
+
 The columns `sample_id` and `library_id` should be self-explanatory. 
+
+<details markdown=1>
+<summary>About read groups</summary>
+Read groups are used in variant calling to distinguish data from different lanes or sequencing runs. This is important as lanes and runs may exhibit different characteristics. For the present pipeline, the effects are perhaps neglibible - partly because it is unlikely that data from lanes or runs need to be merged - but it is good practice in variant calling, so we adopt it.
 
 If you are uncertain about `readgroup_id`, just make sure that it is unique for the combination of library, flowcell and lane. Typically it would be constructed from these components - and the easiest way to get it is from the FastQ file itself (header of read 1, for example).
 
@@ -59,9 +72,7 @@ If you are uncertain about `readgroup_id`, just make sure that it is unique for 
 ```
 For a hypothetical library called "LIB100", this  can be turned into the readgroup id: `AACYTCLM5.1.LIB100` - where `AACYTCLM5` is the ID of the flowcell, `1` is the lane on that flow cell and `LIB100` is the identifier of the library. 
 
-The `single_end` column is prospectively included to enable support for non-paired end sequencing technologies, such as Ion Torrent or Pacbio/ONT (TBD). For the moment, you can just put "false" here. 
-
-`R1` and `R2` designate the full path(s) to the read data. This can either be a local path on your (shared) file system or data in the cloud which you access via e.g., S3, google buckets or FTP. 
+</details>
 
 ### `--genome tomato` [default = tomato]
 
