@@ -115,19 +115,3 @@ The minimum number of reads to support a given SNP. Since we are working with am
 
 ### `--freebayes_min_alternate_frac 0.01` [ default = 0.01]
 The minimum percentage of reads supporting a SNP at a given site for the SNP to be considered. The default of 1% is chosen to be able to detect low levels of contribution but may need some tweaking depending on your exact sequencing setup and coverage. 
-
-## Resources
-
-The following options can be set to control resource usage outside of a site-specific [config](https://github.com/marchoeppner/nf-configs) file.
-
-### `--max_cpus` [ default = 16]
-
-The maximum number of cpus a single job can request. This is typically the maximum number of cores available on a compute node or your local (development) machine. 
-
-### `--max_memory` [ default = 128.GB ]
-
-The maximum amount of memory a single job can request. This is typically the maximum amount of RAM available on a compute node or your local (development) machine, minus a few percent to prevent the machine from running out of memory while running basic background tasks.
-
-### `--max_time`[ default = 240.h ]
-
-The maximum allowed run/wall time a single job can request. This is mostly relevant for environments where run time is restricted, such as in a computing cluster with active resource manager or possibly some cloud environments.  

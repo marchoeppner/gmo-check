@@ -13,7 +13,7 @@ class VCFEntry
     def initialize(string,header)
         # #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	S100
         elements = string.strip.split("\t")
-        @seq,@pos,@id,@ref,@alt,@qual,@filter,info,format, = elements[0..8]
+        @seq,@pos,@id,@ref,@alt,@qual,@filter,info,format = elements[0..8]
         @info = {}
         info.split(";").each do |i|
             key,value = i.split("=")
