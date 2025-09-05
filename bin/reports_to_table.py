@@ -18,7 +18,7 @@ def main(output):
     bucket = {}
 
     # Pre-configured list of toolchains to report
-    toolchains = [ "vsearch", "bwa2"]
+    toolchains = ["vsearch", "bwa2"]
 
     for report in reports:
 
@@ -28,27 +28,29 @@ def main(output):
 
         sample = refs["sample"]
         matches = refs["matches"]
-        
+
         for match in matches:
             rule = match["rule"]
             match["Sample"] = sample
             if rule in bucket:
                 bucket[rule].append(match)
             else:
-                bucket[rule] = [ match ]
+                bucket[rule] = [match]
 
     # Results by rule - creates on result file each
     for rule, matches in bucket.items():
 
-        header = [ "# id: 'gmo_check_result'",
+        header = [
+            "# id: 'gmo_check_result'",
             f"# section_name: '{rule}'",
             f"# description: 'GMO Nachweis für {rule} (Anteil in %).'",
             "# format: 'tsv'",
             "# plot_type: 'table'",
             "# pconfig:",
             "#    id: 'custom_bargraph_w_header'",
-            "#    ylab: 'Anteil GMO'" ]
-        
+            "#    ylab: 'Anteil GMO'"
+            ]
+
         csv_list = []
 
         this_row = []
@@ -56,7 +58,7 @@ def main(output):
         col = 0
 
         # The table header
-        for entry in [ "Probe", "Vsearch/Blast", "Bwa2/Freebayes"]:
+        for entry in ["Probe", "Vsearch/Blast", "Bwa2/Freebayes"]:
             this_row.append(entry)
             col += 1
 
@@ -68,10 +70,9 @@ def main(output):
             if sample in grouped_reports:
                 grouped_reports[sample].append(match)
             else:
-                grouped_reports[sample] = [ match ]
+                grouped_reports[sample] = [match]
 
-    
-        for sample,reports in grouped_reports.items():
+        for sample, reports in grouped_reports.items():
             this_row = []
             row += 1
             col = 0
@@ -82,22 +83,22 @@ def main(output):
 
             for toolchain in toolchains:
                 # Check if we have an entry for this tool chain
-                data = next((item for item in reports if item["toolchain"] == toolchain ),None)
+                data = next((item for item in reports if item["toolchain"] == toolchain), None)
                 if data:
                     this_row.append(str(data["perc_gmo"]))
                 else:
                     this_row.append("-")
-            
+
             csv_list.append(this_row)
 
         rule_name = rule.lower().replace(" ", "_")
         this_result = f"{rule_name}_mqc.tsv"
         with open(this_result, "w") as fo:
-            fo.write("\n".join(header)+ "\n")
+            fo.write("\n".join(header) + "\n")
             for row in csv_list:
                 entry = "\t".join(row)
-                fo.write(entry+ "\n")
-        
+                fo.write(entry + "\n")
+
 
 if __name__ == '__main__':
     main(args.output)

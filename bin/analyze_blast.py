@@ -16,12 +16,12 @@ args = parser.parse_args()
 def main(sample, blast_data, ref_data, output):
 
     # Initialize the data dict
-    data = { "sample": sample, "matches": [] }
+    data = {"sample": sample, "matches": []}
 
     # Parse the JSON file
     with open(ref_data) as f:
         refs = json.load(f)
-    
+
     # Read the rules for OTUs/Blast
     rules = refs["rules"]["vsearch-blast"]["payload"]
 
@@ -32,14 +32,12 @@ def main(sample, blast_data, ref_data, output):
     # Read the Blast reports
     reports = blast["BlastOutput2"]
 
-    findings = []
     total_cov = 0
     carrier_cov = 0
 
     for rule in rules:
 
         total_cov = 0
-        query_cov = 0
 
         rule_name = rule["name"]
         rule_string = rule["matcher"]
@@ -58,8 +56,7 @@ def main(sample, blast_data, ref_data, output):
             hits = results["hits"]
 
             for hit in hits:
-                target = hit["description"][0]["title"]
-                
+
                 for hsp in hit["hsps"]:
                     target_seq = hsp["hseq"]
 
@@ -69,9 +66,9 @@ def main(sample, blast_data, ref_data, output):
 
         if has_matched:
             perc = (float(carrier_cov) / float(total_cov)) * 100
-            data["matches"].append({ "rule": rule_name , "toolchain": "vsearch", "result": rule["positive_report"], "perc_gmo": round(perc,2), "ref_cov": total_cov-carrier_cov, "alt_cov": carrier_cov })
+            data["matches"].append({"rule": rule_name, "toolchain": "vsearch", "result": rule["positive_report"], "perc_gmo": round(perc, 2), "ref_cov": (total_cov-carrier_cov), "alt_cov": carrier_cov})
         else:
-            data["matches"].append({ "rule": rule_name , "toolchain": "vsearch", "result": rule["negative_report"], "ref_cov": total_cov, "alt_cov": "NA" })
+            data["matches"].append({"rule": rule_name, "toolchain": "vsearch", "result": rule["negative_report"], "ref_cov": total_cov, "alt_cov": "NA"})
 
     with open(output, "w") as fo:
         json.dump(data, fo, indent=4, sort_keys=True)
