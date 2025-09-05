@@ -4,16 +4,16 @@ process BIOBLOOMTOOLS_CATEGORIZER {
 
     tag "${meta.sample_id}|${meta.library_id}|${meta.readgroup_id}"
 
-    conda 'bioconda::biobloomtools=2.3.5'
+    conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/biobloomtools:2.3.5--h4056dc3_2' :
         'quay.io/biocontainers/biobloomtools:2.3.5--h4056dc3_2' }"
 
     input:
-    tuple val(meta), path(r1), path(r2)
+    tuple val(meta), path(reads)
 
     output:
-    tuple val(meta), path(r1_trim), path(r2_trim), emit: reads
+    tuple val(meta), path('*noMatch*.fq.gz'), emit: reads
     path('versions.yml'), emit: versions
     path("*summary.tsv"), emit: results
 
@@ -23,7 +23,7 @@ process BIOBLOOMTOOLS_CATEGORIZER {
     r2_trim = filtered + '_noMatch_2.fq.gz'
 
     """
-    biobloomcategorizer -p $filtered -t ${task.cpus} -n --fq --gz_out -i -e -f "${params.bloomfilter}" $r1 $r2
+    biobloomcategorizer -p $filtered -t ${task.cpus} -n --fq --gz_out -i -e -f "${params.bloomfilter}" $reads
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

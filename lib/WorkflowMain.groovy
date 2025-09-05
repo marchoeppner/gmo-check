@@ -19,7 +19,6 @@ class WorkflowMain {
         }
     }
 
-    // TODO: Change name of the pipeline below
     public static String header(workflow) {
         def headr = ''
         def infoLine = "${workflow.manifest.description} | version ${workflow.manifest.version}"
@@ -42,7 +41,9 @@ class WorkflowMain {
             Required parameters:
             --input                        The primary pipeline input (typically a CSV file)
             --email                        Email address to send reports to (enclosed in '')
+            --tools                        A comma-separated list of tool chains to run (vsearch, bwa2)
             Optional parameters:
+            --genome                       Use this reference genome when requesting 'bwa2' tool chain
             --run_name                     A descriptive name for this pipeline run
             Output:
             --outdir                       Local directory to which all output is written (default: results)

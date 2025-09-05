@@ -33,7 +33,6 @@ Some aspects of this code base are controlled by config files. These are:
 
 /conf/base.config - this file sets the computing specifications for different types of processes. 
 
-/conf/lsh.config - this is an example of a site-specific config file (set as "standard" profile in nextflow.config), in which you can provide information about your compute environment. Make sure to create a new profile for it too. 
 
 ## Groovy libraries
 
@@ -62,10 +61,6 @@ If mulling containers is not an option, you can also refer to github actions and
 ## Github workflows
 
 Github supports the automatic execution of specific tasks on code branches, such as the automatic linting of the code base or building and pushing of Docker containers. To add github workflows to your repository, place them into the sub-directory `.github/workflows`. 
-
-### Docker containers
-
-In order to automatically push Docker containers, you must add your docker username and API token as secrets to your repository (DOCKERHUB_USERNAME and DOCKERHUB_TOKEN). Secrets can be created under Settings/Secrets and Variables/Actions. Of course, you also need to have an account on Dockerhub and generate a permanent token.  The relevant workflow actions are included in `dot_github/workflows`. These will read the `Dockerfile` from the root of this repository, import environment.yml (if you wish to install conda packages into the container), build the whole thing and push the container to an appropriate dockerhub repository 
 
 ## How to start
 
@@ -141,7 +136,59 @@ npm-groovy-lint
 
 You'll note that some obvious errors/warnings are omitted. This behavior is controlled by the settings in .groovylintrc [documentation](https://www.npmjs.com/package/npm-groovy-lint), included with this template. If you need to switch on some stuff, just add it the config file - and vice-versa. 
 
+## Adding new genomes and targets
 
-## Sending report emails
+This pipeline uses a JSON-formatted config file to keep track of the supported analyses. The most basic form looks as follows:
 
-This template is set up to send the final QC report via Email (--email you@gmail.com). This requires for sendmail to be configured on the executing node/computer. 
+```JSON
+{
+    "rules": {
+        "vsearch-blast": {
+            "payload": [
+                {
+                    "format": "JSON",
+                    "name": "GABA Mutation in SIGAD3",
+                    "target": "SiGAD3|NM_001246898.2",
+                    "matcher": "AAAG-TGGA",
+                    "positive_report": "Diese Probe enthält eine GABA Mutation in SIGAD3. Nachweis erbraucht über: Amplicon Analyse.",
+                    "negative_report": "Für diese Probe konnte keine GABA Mutation in SIGAD3 nachgewiesen werden."
+                }
+            ]
+            
+        },
+        "bwa-freebayes": {
+            "payload": [
+                {
+                    "format": "VCF",
+                    "target": "1:14834-14836",
+                    "name": "GABA Mutation in SIGAD3",
+                    "matcher": "1\t14834\t.\tGTG\tGTTG",
+                    "positive_report": "Diese Probe enthält eine GABA Mutation in SIGAD3. Nachweis erbracht über: Varianten Analyse.",
+                    "negative_report": "Für diese Probe konnte keine GABA Mutation in SIGAD3 nachgewiesen werden."
+                } 
+            ]
+        }
+    }
+}
+```
+
+This file is reference-genome specific and lives in `assets/genome/NAME_OF_SPECIES/rules.json` [example](../assets/genomes/tomato/rules.json)
+
+The rule set knows two types of rules:
+
+- `vsearch-blast` - for analyses that use assembled and clustered amplicons to find patterns in a BLAST database
+
+- `bwa-freebayes` - for analyses that use read alignment and variant calling against a reference genome. 
+
+To add new targets to an already established reference genome:
+
+- Add new elements to the appropriate payload block in the rules.json manifest, following the example structure above
+- If you want to enable the vsearch-blast tool chain, make sure that the built-in [Blast Database](../assets/blastdb.fasta.gz) contains the required target motif(s) (usually a gene of interest). 
+- Add the necessary primer information to the Ptrimmer config (amplicon.txt)
+- Add the primer sequences to the cutadapt fasta file (primers.fa)
+
+To add new reference genomes and matching target rules:
+
+- Add the necessary information about the new reference genome into the [resources.config](../conf/resources.config) file, including a download link. 
+- Create a new species folder under /assets/genome
+- Add the relevant files as described for above for adding individual assets

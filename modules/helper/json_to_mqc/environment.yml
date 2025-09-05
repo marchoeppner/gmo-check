@@ -1,0 +1,7 @@
+name: json_to_mqc
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - bioconda::multiqc=1.19

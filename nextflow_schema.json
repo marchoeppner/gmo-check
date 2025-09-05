@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/marchoeppner/gmo-check//nextflow_schema.json",
+  "title": "marchoeppner/gmo-check pipeline parameters",
+  "description": "Pipeline to check for genetically modified food stuff",
+  "type": "object",
+  "$defs": {
+    "input_output_options": {
+      "title": "Input/output options",
+      "type": "object",
+      "fa_icon": "fas fa-terminal",
+      "description": "Define where the pipeline should find input data and save output data.",
+      "required": ["input", "outdir"],
+      "properties": {
+        "input": {
+          "type": "string",
+          "format": "file-path",
+          "exists": true,
+          "schema": "assets/schema_input.json",
+          "mimetype": "text/csv",
+          "pattern": "^\\S+\\.csv$",
+          "description": "Path to comma-separated file containing information about the samples in the experiment.",
+          "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row.",
+          "fa_icon": "fas fa-file-csv"
+        },
+        "outdir": {
+          "type": "string",
+          "format": "directory-path",
+          "description": "The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure.",
+          "fa_icon": "fas fa-folder-open",
+          "default": "results"
+        },
+        "build_references": {
+          "type": "boolean",
+          "description": "Alternative workflow to build the local reference data"
+        }
+      }
+    },
+    "generic_options": {
+      "title": "Generic options",
+      "type": "object",
+      "fa_icon": "fas fa-file-import",
+      "description": "Less common options for the pipeline, typically set in a config file.",
+      "help_text": "These options are common to all nf-core pipelines and allow you to customise some of the core preferences for how the pipeline runs.\n\nTypically these options would be set in a Nextflow config file loaded for all pipeline runs, such as `~/.nextflow/config`.",
+      "properties": {
+        "version": {
+          "type": "boolean",
+          "description": "Display version and exit.",
+          "fa_icon": "fas fa-question-circle",
+          "hidden": true
+        },
+        "tools": {
+          "type": "string",
+          "default": "vsearch",
+          "description": "List of tool chains to use (bwa2, vsearch or both)"
+        },
+        "run_name": {
+          "type": "string",
+          "description": "A descriptive name for this analysis run"
+        },
+        "reference_base": {
+          "type": "string",
+          "description": "The location to where the reference data was installed to"
+        }
+      },
+      "required": ["run_name", "reference_base", "tools"]
+    },
+    "variant_calling_bwa2": {
+      "title": "Variant calling (BWA2)",
+      "type": "object",
+      "description": "",
+      "default": "",
+      "properties": {
+        "freebayes_min_alternate_count": {
+          "type": "integer",
+          "default": 50,
+          "description": "Required coverage for an ALT allele to be considered"
+        },
+        "freebayes_min_alternate_frac": {
+          "type": "number",
+          "default": 0.01,
+          "description": "Required minimum fraction for an ALT allele to be considered"
+        }
+      },
+      "required": ["freebayes_min_alternate_count", "freebayes_min_alternate_frac"]
+    }
+  },
+  "allOf": [
+    {
+      "$ref": "#/$defs/input_output_options"
+    },
+    {
+      "$ref": "#/$defs/generic_options"
+    },
+    {
+      "$ref": "#/$defs/variant_calling_bwa2"
+    }
+  ],
+  "properties": {
+    "logo": {
+      "type": "string",
+      "default": "/home/marc/git/gmo-check/assets/pipelinelogo.png",
+      "hidden": true
+    },
+    "genome": {
+      "type": "string",
+      "default": "tomato",
+      "description": "Which genome to use as reference"
+    },
+    "blastdb": {
+      "type": "string",
+      "hidden": true
+    },
+    "bloomfilter": {
+      "type": "string",
+      "default": "/home/marc/git/gmo-check/assets/bloomfilter/phix.bf",
+      "hidden": true
+    },
+    "skip_multiqc": {
+      "type": "boolean",
+      "hidden": true
+    },
+    "multiqc_config": {
+      "type": "string",
+      "default": "/home/marc/git/gmo-check/conf/multiqc_config.yaml",
+      "hidden": true
+    },
+    "multiqc_logo": {
+      "type": "string",
+      "default": "/home/marc/git/gmo-check/assets/pipelinelogo.png",
+      "hidden": true
+    },
+    "publish_dir_mode": {
+      "type": "string",
+      "default": "copy",
+      "hidden": true
+    },
+    "custom_config_base": {
+      "type": "string",
+      "default": "https://raw.githubusercontent.com/bio-raum/nf-configs/main",
+      "hidden": true
+    },
+    "reference_version": {
+      "type": "integer",
+      "default": 1,
+      "hidden": true
+    }
+  }
+}
