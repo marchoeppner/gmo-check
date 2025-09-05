@@ -26,8 +26,6 @@ There is also the option to use Conda, but we **strongly discourage** this becau
 
 The pipeline comes with simple pre-set profiles for all of these as described [here](usage.md); if you plan to use this pipeline regularly, consider adding your own custom profile to our [central repository](https://github.com/bio-raum/nf-configs) to better leverage your available resources.
 
-Also note that Nextflow supports additional software provisioning [frameworks](https://www.nextflow.io/docs/latest/container.html). These may very well work also, but have not been tested by us and would need to be configured as part of your [site-specific](#site-specific-config-file) config file. 
-
 ## Installing the references
 
 This pipeline requires locally stored references, matched to the (major!) pipeline version you plan to use (-r). To build these, do:
