@@ -1,5 +1,5 @@
-process BLAST_TO_REPORT {
-    tag "${meta.sample_id}"
+process JSON_TO_MQC {
+    tag 'All'
 
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
@@ -7,20 +7,14 @@ process BLAST_TO_REPORT {
         'quay.io/biocontainers/multiqc:1.19--pyhdfd78af_0' }"
 
     input:
-    tuple val(meta), path(blast)
-    path(rules)
+    path(jsons)
 
     output:
-    tuple val(meta), path(report), emit: json
+    path("*_mqc.tsv"), emit: mqc
 
     script:
-    report = blast.getBaseName() + '.report.json'
 
-    """
-    analyze_blast.py \
-    --blast $blast \
-    --json $rules \
-    --sample ${meta.sample_id} \
-    --output $report
-    """
+    '''
+    reports_to_table.py
+    '''
 }

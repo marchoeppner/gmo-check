@@ -1,25 +1,26 @@
-process BLAST_TO_REPORT {
+process VCF_TO_REPORT {
     tag "${meta.sample_id}"
 
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/multiqc:1.19--pyhdfd78af_0' :
-        'quay.io/biocontainers/multiqc:1.19--pyhdfd78af_0' }"
+        'https://depot.galaxyproject.org/singularity/pyvcf3:1.0.4--py311haab0aaa_0' :
+        'quay.io/biocontainers/pyvcf3:1.0.4--py311haab0aaa_0' }"
 
     input:
-    tuple val(meta), path(blast)
+    tuple val(meta), path(vcf), path(coverage)
     path(rules)
 
     output:
     tuple val(meta), path(report), emit: json
 
     script:
-    report = blast.getBaseName() + '.report.json'
+    report = vcf.getBaseName() + '.report.json'
 
     """
-    analyze_blast.py \
-    --blast $blast \
+    analyze_vcf.py \
+    --vcf $vcf \
     --json $rules \
+    --coverage $coverage \
     --sample ${meta.sample_id} \
     --output $report
     """

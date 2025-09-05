@@ -38,6 +38,7 @@ def main(output):
 
     reports = sorted(glob.glob("*.json"))
 
+    # All the JSON reports
     for report in reports:
 
         # Parse the JSON file
@@ -47,6 +48,7 @@ def main(output):
         sample = data["sample"]
         matches = data["matches"]
 
+        # group by rule, then sample
         for match in matches:
             toolchain = match["toolchain"]
             rule = match["rule"]
@@ -65,6 +67,8 @@ def main(output):
     toolchains.sort()
 
     sheet_index = 0
+
+    # write one sheet per rule, listing all the samples
     for rule, samples in bucket.items():
          
         ws = wb.create_sheet(title=rule, index=sheet_index)

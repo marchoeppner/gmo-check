@@ -139,6 +139,11 @@
       "type": "string",
       "default": "https://raw.githubusercontent.com/bio-raum/nf-configs/main",
       "hidden": true
+    },
+    "reference_version": {
+      "type": "integer",
+      "default": 1,
+      "hidden": true
     }
   }
 }

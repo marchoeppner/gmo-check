@@ -8,7 +8,7 @@ workflow INPUT_CHECK {
 
     main:
     samplesheet
-        .splitCsv(header:true, sep:',')
+        .splitCsv(header:true, sep:'\t')
         .map { row -> fastq_channel(row) }
         .set { reads }
 
@@ -20,7 +20,7 @@ workflow INPUT_CHECK {
 def fastq_channel(LinkedHashMap row) {
 
     def meta = [:]
-    meta.sample_id      = row.sample_id
+    meta.sample_id      = row.sample
     meta.single_end     = false
     meta.library_id     = row.library_id
     meta.readgroup_id   = row.readgroup_id

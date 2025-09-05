@@ -8,6 +8,7 @@ process BWAMEM2_MEM {
 
     input:
     tuple val(meta), path(reads)
+    path(bwa_index)
     tuple path(fasta),path(fai),path(dict)
 
     output:
@@ -18,8 +19,13 @@ process BWAMEM2_MEM {
     bam = "${meta.sample_id}_${meta.library_id}_${meta.readgroup_id}_bwa2-aligned.fm.bam"
 
     """
-    bwa-mem2 mem -H ${dict} -M -R "@RG\\tID:${meta.readgroup_id}\\tPL:ILLUMINA\\tSM:${meta.sample_id}\\tLB:${meta.library_id}\\tDS:${fasta}" \
-    -t ${task.cpus} ${fasta} $reads \
+    INDEX=`find -L ./ -name "*.amb" | sed 's/\\.amb\$//'`
+
+    bwa-mem2 mem -H ${dict} -M \
+    -R "@RG\\tID:${meta.readgroup_id}\\tPL:ILLUMINA\\tSM:${meta.sample_id}\\tLB:${meta.library_id}\\tDS:${fasta}" \
+    -t ${task.cpus} \
+    \$INDEX \
+    $reads \
     | samtools fixmate -@ ${task.cpus} -m - - \
     | samtools sort -@ ${task.cpus} -m 2G -O bam -o $bam -
 

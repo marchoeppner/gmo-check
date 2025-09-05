@@ -13,8 +13,11 @@ args = parser.parse_args()
 
 def main(output):
 
+    # Read all the JSON reports
     reports = sorted(glob.glob("*.json"))
     bucket = {}
+
+    # Pre-configured list of toolchains to report
     toolchains = [ "vsearch", "bwa2"]
 
     for report in reports:
@@ -34,11 +37,12 @@ def main(output):
             else:
                 bucket[rule] = [ match ]
 
+    # Results by rule - creates on result file each
     for rule, matches in bucket.items():
 
         header = [ "# id: 'gmo_check_result'",
-            "# section_name: '#{rule}'",
-            "# description: 'GMO Nachweis für #{rule} (Anteil in %).'",
+            f"# section_name: '{rule}'",
+            f"# description: 'GMO Nachweis für {rule} (Anteil in %).'",
             "# format: 'tsv'",
             "# plot_type: 'table'",
             "# pconfig:",

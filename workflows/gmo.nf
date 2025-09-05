@@ -22,15 +22,22 @@ workflow GMO {
     main:
 
     /*
+    Check if there references are installed
+    */
+    refDir = file(params.reference_base + "/gmo-check/${params.reference_version}")
+    if (!refDir.exists()) {
+        log.info 'The required reference directory was not found on your system, exiting!'
+        System.exit(1)
+    }
+    /*
     Set default channels
     */
     ch_db_file      = Channel.fromPath("${baseDir}/assets/blastdb.fasta.gz", checkIfExists: true)        // The built-in blast database
     fasta           = params.references.genomes[params.genome].fasta                                     // The reference genome to be used
     fai             = params.references.genomes[params.genome].fai                                       // The fasta index of the reference genome
     dict            = params.references.genomes[params.genome].dict                                      // The dictionary of the reference genome
-    references      = [ fasta, fai, dict ]
-
-    ch_bed          = Channel.fromPath(params.references.genomes[params.genome].bed).collect()           // Bed file with primer locations
+    bwa_index       = Channel.fromPath(file(params.references.genomes[params.genome].fasta).parent)      // a directory with the BWA2 index files
+    references      = [ fasta, fai, dict ]                                                               // The fasta reference with fai and dict (mostly Freebayes)
     ch_amplicon_txt = Channel.fromPath(params.references.genomes[params.genome].amplicon_txt).collect()  // The ptrimmer primer manifest
     ch_rules        = Channel.fromPath(params.references.genomes[params.genome].rules).collect()         // rules to define what we consider a hit
 
@@ -71,7 +78,7 @@ workflow GMO {
         BWAMEM2_WORKFLOW(
             FASTP.out.reads,
             references,
-            ch_bed,
+            bwa_index,
             ch_rules
         )
         multiqc_files   = multiqc_files.mix(BWAMEM2_WORKFLOW.out.qc)

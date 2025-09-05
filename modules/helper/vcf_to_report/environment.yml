@@ -1,0 +1,7 @@
+name: vcf_to_report
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - bioconda::pyvcf3=1.0.4

@@ -1,26 +1,20 @@
-process BLAST_TO_REPORT {
-    tag "${meta.sample_id}"
+process RULES_TO_BED {
 
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/multiqc:1.19--pyhdfd78af_0' :
         'quay.io/biocontainers/multiqc:1.19--pyhdfd78af_0' }"
-
+        
     input:
-    tuple val(meta), path(blast)
-    path(rules)
+    path(json)
 
     output:
-    tuple val(meta), path(report), emit: json
+    path(bed), emit: bed
 
     script:
-    report = blast.getBaseName() + '.report.json'
+    bed = 'rules.txt'
 
     """
-    analyze_blast.py \
-    --blast $blast \
-    --json $rules \
-    --sample ${meta.sample_id} \
-    --output $report
+    rules_to_bed.py --json $json --output $bed
     """
 }

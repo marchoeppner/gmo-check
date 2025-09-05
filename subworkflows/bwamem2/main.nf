@@ -9,13 +9,13 @@ include { SAMTOOLS_AMPLICONCLIP }   from './../../modules/samtools/ampliconclip'
 include { FREEBAYES }               from './../../modules/freebayes'
 include { VCF_TO_REPORT }           from './../../modules/helper/vcf_to_report'
 include { RULES_TO_BED }            from './../../modules/helper/rules_to_bed'
-include { BEDTOOLS_COVERAGE }       from './../../modules/bedtools/coverage'
+include { MOSDEPTH }                from './../../modules/mosdepth'
 
 workflow BWAMEM2_WORKFLOW {
     take:
     reads
     fasta
-    bed
+    bwa_index
     rules
 
     main:
@@ -35,6 +35,7 @@ workflow BWAMEM2_WORKFLOW {
     */
     BWAMEM2_MEM(
         reads,
+        bwa_index,
         fasta
     )
     ch_versions = ch_versions.mix(BWAMEM2_MEM.out.versions)
@@ -75,18 +76,19 @@ workflow BWAMEM2_WORKFLOW {
         ch_bed
     )
     ch_versions = ch_versions.mix(FREEBAYES.out.versions)
-
+   
     /*
     Get coverage of target region(s)
     This is to ensure that we always have a coverage
     even with the sample only contains wildtype, i.e. no variant calls
     */
-    BEDTOOLS_COVERAGE(
+    MOSDEPTH(
         SAMTOOLS_AMPLICONCLIP.out.bam,
         ch_bed
     )
+    ch_versions = ch_versions.mix(MOSDEPTH.out.versions)
 
-    ch_variants_with_cov = FREEBAYES.out.vcf.join(BEDTOOLS_COVERAGE.out.report)
+    ch_variants_with_cov = FREEBAYES.out.vcf.join(MOSDEPTH.out.regions)
 
     // Obtain results from VCF file using rules
     VCF_TO_REPORT(
