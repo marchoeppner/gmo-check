@@ -24,9 +24,15 @@ def main(json_file, output):
 
             name = rule["name"]
             target = rule["target"].split(":")
+            ref = rule["matcher"].split("\t")[3]
+            seq = target.pop(0)
+            positions = target.pop(0).split("-")
+            seq_from = int(positions.pop(0))
+            if not positions:
+                seq_to = seq_from + len(ref)
+            else:
+                seq_to = int(positions.pop(0))
 
-            seq = target.shift
-            seq_from,seq_to = [ int(i) for i in target.pop(0).split("-") ]
             fo.write(f"{seq}\t{seq_from-1}\t{seq_to+1}\t{name}\n")
 
 

@@ -33,9 +33,12 @@ rules.each do |rule|
 
     name = rule["name"]
     target = rule["target"].split(":")
-
+    ref_allele = rule["matcher"].split("\t")[3]
     seq = target.shift
     from,to = target.shift.split("-").collect{|t| t.to_i }
+    if to.nil?
+        to = from + ref_allele.length
+    end
 
     puts "#{seq}\t#{from-1}\t#{to+1}\t#{name}"
 

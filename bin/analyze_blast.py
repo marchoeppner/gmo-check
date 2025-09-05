@@ -51,23 +51,27 @@ def main(sample, blast_data, ref_data, output):
             r = report["report"]
             results = r["results"]["search"]
             query_string = results["query_title"]
-            query, coverage = [ str(i) for i in query_string.split(";") ]
-            coverage = coverage.replace("size=", "")
+            query, coverage_string = query_string.split(";")
+            coverage = int(coverage_string.replace("size=", ""))
 
             total_cov += coverage
             hits = results["hits"]
 
             for hit in hits:
                 target = hit["description"][0]["title"]
-                if rule_string in target:
-                    has_matched = True
-                    carrier_cov += coverage
+                
+                for hsp in hit["hsps"]:
+                    target_seq = hsp["hseq"]
+
+                    if rule_string in target_seq:
+                        has_matched = True
+                        carrier_cov += coverage
 
         if has_matched:
             perc = (float(carrier_cov) / float(total_cov)) * 100
-            output["matches"].append({ "rule": rule_name , "toolchain": "vsearch", "result": rule["positive_report"], "perc_gmo": perc.round(2), "ref_cov": total_cov-carrier_cov, "alt_cov": carrier_cov })
+            data["matches"].append({ "rule": rule_name , "toolchain": "vsearch", "result": rule["positive_report"], "perc_gmo": round(perc,2), "ref_cov": total_cov-carrier_cov, "alt_cov": carrier_cov })
         else:
-            output["matches"].append({ "rule": rule_name , "toolchain": "vsearch", "result": rule["negative_report"], "ref_cov": total_cov, "alt_cov": "NA" })
+            data["matches"].append({ "rule": rule_name , "toolchain": "vsearch", "result": rule["negative_report"], "ref_cov": total_cov, "alt_cov": "NA" })
 
     with open(output, "w") as fo:
         json.dump(data, fo, indent=4, sort_keys=True)

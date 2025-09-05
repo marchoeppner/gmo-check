@@ -87,7 +87,7 @@ coverages = {}
 cov_lines = IO.readlines(options.coverage)
 cov_lines.each do |cl|
     # 1	14834	14836	GABA Mutation in SIGAD3	1332221	2	2	1.0000000
-    seq,from,to,name,cov,la,lb,frac = cl.split("\t")
+    seq,from,to,name,cov = cl.split("\t")
     coverages[name] = cov.to_i
 end
 
@@ -128,10 +128,19 @@ rules.each do  |rule|
                 this_match["comment"] = "Variantenfrequenz unter Call-Schwelle!"
             end
 
-            rcov,acov = this_sample["AD"].split(",")
-            cov_sum = acov.to_i + rcov.to_i
-            perc = (acov.to_f / cov_sum.to_f)*100.0
+            # Freebayes counts all the reads to determine coverage, even if they are overlapping pairs
+            # To calculate the actual coverage, we take the independently determined
+            # BAM coverage and multiply it with the read fraction of the REF and ALT alleles
+            rcov,acov = this_sample["AD"].split(",").map {|f| f.to_i}
+            cov_sum = acov + rcov
+            perc = (acov.to_f / cov_sum.to_f) * 100.0
             
+            total_cov = rcov + acov
+            if this_cov != "NA"
+                rcov = ((rcov.to_f/total_cov.to_f) * this_cov).round(0)
+                acov = ((acov.to_f/total_cov.to_f) * this_cov).round(0)
+            end
+
             this_match["perc_gmo"] = perc.round(2)
             this_match["ref_cov"] = rcov
             this_match["alt_cov"] = acov

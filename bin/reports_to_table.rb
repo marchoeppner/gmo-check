@@ -82,6 +82,7 @@ bucket.each do |rule,reports|
     end
 
     csv_list << this_row
+
     # Each sample with all its reports (max 2)
     reports.group_by{|r| r["Sample"]}.sort.each do |sample,data|
 

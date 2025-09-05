@@ -15,6 +15,15 @@ parser.add_argument("--input", help="An input option")
 parser.add_argument("--output")
 args = parser.parse_args()
 
+def flatten_extend(matrix):
+    flat_list = []
+    for row in matrix:
+        if type(row) is list:
+            flat_list.extend(row)
+        else:
+            flat_list.append(row)
+    return flat_list
+
 
 def main(output):
 
@@ -55,21 +64,22 @@ def main(output):
 
     toolchains.sort()
 
+    sheet_index = 0
     for rule, samples in bucket.items():
          
-        ws = wb.create_sheet(title=rule)
+        ws = wb.create_sheet(title=rule, index=sheet_index)
+        sheet_index += 1
 
         header = [ "" ] 
         for tool in toolchains:
             header.append( [tool, "", ""])
-        
-        ws.append(sum(header,[]))
+        ws.append(flatten_extend(header))
 
-        header = ["Probe"]
+        header = [ "Probe" ]
         for tool in toolchains:
             header.append([ "% GMO","Reads WT","Reads GMO"])
 
-        ws.append(sum(header,[]))
+        ws.append(flatten_extend(header))
 
         row = 0
 
@@ -93,7 +103,7 @@ def main(output):
                     perc_gmo = float(report["perc_gmo"])
                     ref_cov = int(report["ref_cov"])
                     alt_cov = int(report["alt_cov"])
-                    if ref_cov == "NA" & report.has_key("bam_cov"):
+                    if ref_cov == "NA" and "bam_cov" in report:
                         ref_cov = report["bam_cov"]
                         alt_cov = "-"
                 
@@ -119,7 +129,7 @@ def main(output):
         for column in range(ws.min_column, ws.max_column + 1):
             dim_holder[get_column_letter(column)] = ColumnDimension(ws, min=column, max=column, width=20)
         ws.column_dimensions = dim_holder
-        ws.freeze_panes = ws["A2"]
+        ws.freeze_panes = ws["A3"]
 
     # Write excel file
     wb.save(output)
