@@ -72,7 +72,7 @@ def main(output):
             else:
                 grouped_reports[sample] = [match]
 
-        for sample,reports in grouped_reports.items():
+        for sample, reports in grouped_reports.items():
             this_row = []
             row += 1
             col = 0
@@ -83,7 +83,7 @@ def main(output):
 
             for toolchain in toolchains:
                 # Check if we have an entry for this tool chain
-                data = next((item for item in reports if item["toolchain"] == toolchain ), None)
+                data = next((item for item in reports if item["toolchain"] == toolchain), None)
                 if data:
                     this_row.append(str(data["perc_gmo"]))
                 else:
@@ -94,11 +94,11 @@ def main(output):
         rule_name = rule.lower().replace(" ", "_")
         this_result = f"{rule_name}_mqc.tsv"
         with open(this_result, "w") as fo:
-            fo.write("\n".join(header)+ "\n")
+            fo.write("\n".join(header) + "\n")
             for row in csv_list:
                 entry = "\t".join(row)
-                fo.write(entry+ "\n")
-        
+                fo.write(entry + "\n")
+
 
 if __name__ == '__main__':
     main(args.output)

@@ -29,7 +29,6 @@ def flatten_extend(matrix):
 def main(output):
 
     wb = Workbook()
-    ft = Font(name="Sans", bold=True)
     cb_even = PatternFill(fill_type="solid", fgColor="d9e1f2")
     cb_uneven = PatternFill(fill_type="solid", fgColor="cdd1d9")
     cb_failed = PatternFill(fill_type="solid", fgColor="FF3300")
@@ -82,7 +81,7 @@ def main(output):
 
         header = ["Probe"]
         for tool in toolchains:
-            header.append(["% GMO","Reads WT","Reads GMO"])
+            header.append(["% GMO", "Reads WT", "Reads GMO"])
 
         ws.append(flatten_extend(header))
 
@@ -102,7 +101,7 @@ def main(output):
                 ref_cov = ""
                 alt_cov = ""
 
-                report = [d for d in reports if d['toolchain'] == tool ][0]
+                report = [d for d in reports if d['toolchain'] == tool][0]
 
                 if report:
                     perc_gmo = float(report["perc_gmo"])
@@ -111,8 +110,8 @@ def main(output):
                     if ref_cov == "NA" and "bam_cov" in report:
                         ref_cov = report["bam_cov"]
                         alt_cov = "-"
-                
-                # Simplistic rule to catch failed samples. 
+
+                # Simplistic rule to catch failed samples.
                 if ref_cov < 100:
                     failed = True
 
@@ -125,11 +124,11 @@ def main(output):
                 bg_color = cb_failed
             else:
                 bg_color = cb_even if (row & 1) else cb_uneven
-                
-            for col in ["A", "B", "C", "D", "E", "F", "G", "H"]:
-                ws[col+str(ws._current_row)].fill = bg_color       
 
-         # Auto-width for columns
+            for col in ["A", "B", "C", "D", "E", "F", "G", "H"]:
+                ws[col+str(ws._current_row)].fill = bg_color
+
+        # Auto-width for columns
         dim_holder = DimensionHolder(worksheet=ws)
         for column in range(ws.min_column, ws.max_column + 1):
             dim_holder[get_column_letter(column)] = ColumnDimension(ws, min=column, max=column, width=20)
@@ -138,7 +137,7 @@ def main(output):
 
     # Write excel file
     wb.save(output)
-    
+
 
 if __name__ == '__main__':
     main(args.output)

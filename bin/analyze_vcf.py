@@ -21,7 +21,7 @@ def main(sample, vcf_file, ref_data, coverage_file, output):
     # Read BAM coverage and store in dict
     cov_lines = [line.strip() for line in open(coverage_file, 'r')]
     for line in cov_lines:
-        seq, seq_from, seq_to, name,cov = [str(i) for i in line.split("\t")]
+        seq, seq_from, seq_to, name, cov = [str(i) for i in line.split("\t")]
         coverages[name] = float(cov)
 
     result = {"sample": sample, "matches": []}
@@ -42,7 +42,7 @@ def main(sample, vcf_file, ref_data, coverage_file, output):
 
         this_cov = coverages[rule_name] if rule_name in coverages else "NA"
 
-        this_match = {"toolchain": "bwa2" , "rule": rule_name, "bam_cov": this_cov}
+        this_match = {"toolchain": "bwa2", "rule": rule_name, "bam_cov": this_cov}
 
         has_matched = False
 
@@ -65,7 +65,7 @@ def main(sample, vcf_file, ref_data, coverage_file, output):
                 if genotype == "0/0":
                     this_match["comment"] = "Variantenfrequenz unter Call-Schwelle!"
 
-                rcov,acov = [int(i) for i in this_sample["AD"]]
+                rcov, acov = [int(i) for i in this_sample["AD"]]
                 cov_sum = acov + rcov
 
                 # Freebayes counts invididual reads even if they overlap
