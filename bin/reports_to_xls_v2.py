@@ -8,7 +8,7 @@ import json
 from openpyxl import Workbook
 from openpyxl.worksheet.dimensions import ColumnDimension, DimensionHolder
 from openpyxl.utils import get_column_letter
-from openpyxl.styles import Font, PatternFill
+from openpyxl.styles import PatternFill
 
 parser = argparse.ArgumentParser(description="Script options")
 parser.add_argument("--input", help="An input option")
