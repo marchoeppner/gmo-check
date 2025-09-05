@@ -15,6 +15,7 @@ parser.add_argument("--input", help="An input option")
 parser.add_argument("--output")
 args = parser.parse_args()
 
+
 def flatten_extend(matrix):
     flat_list = []
     for row in matrix:
@@ -53,7 +54,7 @@ def main(output):
             toolchain = match["toolchain"]
             rule = match["rule"]
 
-            if not toolchain in toolchains:
+            if toolchain not in toolchains:
                 toolchains.append(toolchain)
 
             if rule not in bucket:
@@ -62,7 +63,7 @@ def main(output):
             if sample in bucket[rule]:
                 bucket[rule][sample].append(match)
             else:
-                bucket[rule][sample] = [ match ]
+                bucket[rule][sample] = [match]
 
     toolchains.sort()
 
@@ -70,18 +71,18 @@ def main(output):
 
     # write one sheet per rule, listing all the samples
     for rule, samples in bucket.items():
-         
+
         ws = wb.create_sheet(title=rule, index=sheet_index)
         sheet_index += 1
 
-        header = [ "" ] 
+        header = [""]
         for tool in toolchains:
-            header.append( [tool, "", ""])
+            header.append([tool, "", ""])
         ws.append(flatten_extend(header))
 
-        header = [ "Probe" ]
+        header = ["Probe"]
         for tool in toolchains:
-            header.append([ "% GMO","Reads WT","Reads GMO"])
+            header.append(["% GMO","Reads WT","Reads GMO"])
 
         ws.append(flatten_extend(header))
 
@@ -91,7 +92,7 @@ def main(output):
 
             row += 1
 
-            this_row = [ sample ]
+            this_row = [sample]
 
             failed = False
 
@@ -115,7 +116,7 @@ def main(output):
                 if ref_cov < 100:
                     failed = True
 
-                for e in [ perc_gmo, ref_cov, alt_cov ]:
+                for e in [perc_gmo, ref_cov, alt_cov]:
                     this_row.append(e)
 
             ws.append(this_row)
