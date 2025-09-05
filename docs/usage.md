@@ -16,7 +16,7 @@ A basic execution of the pipeline looks as follows:
 a) Without a site-specific config file
 
 ```bash
-nextflow run marchoeppner/gmo-check -profile standard,singularity \\
+nextflow run marchoeppner/gmo-check -profile singularity \\
 --input samples.csv \\
 --genome tomato \\
 --reference_base /path/to/references \\
@@ -26,11 +26,11 @@ where `path_to_references` corresponds to the location in which you have [instal
 
 In this example, the pipeline will assume it runs on a single computer with the singularity container engine available. Other options to provision software are:
 
-`-profile standard,docker` 
+`-profile docker` 
 
-`-profile standard,podman` 
+`-profile podman` 
 
-`-profile standard,conda` THIS ISN'T FULLY SUPPORTED YET! To Do
+`-profile conda` THIS ISN'T FULLY SUPPORTED YET! To Do
 
 b) with a site-specific config file
 
