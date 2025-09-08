@@ -36,7 +36,7 @@ workflow GMO {
     fasta           = params.references.genomes[params.genome].fasta                                     // The reference genome to be used
     fai             = params.references.genomes[params.genome].fai                                       // The fasta index of the reference genome
     dict            = params.references.genomes[params.genome].dict                                      // The dictionary of the reference genome
-    bwa_index       = Channel.fromPath(file(params.references.genomes[params.genome].fasta).parent)      // a directory with the BWA2 index files
+    bwa_index       = Channel.fromPath(file(params.references.genomes[params.genome].fasta).parent).collect()      // a directory with the BWA2 index files
     references      = [ fasta, fai, dict ]                                                               // The fasta reference with fai and dict (mostly Freebayes)
     ch_amplicon_txt = Channel.fromPath(params.references.genomes[params.genome].amplicon_txt).collect()  // The ptrimmer primer manifest
     ch_rules        = Channel.fromPath(params.references.genomes[params.genome].rules).collect()         // rules to define what we consider a hit

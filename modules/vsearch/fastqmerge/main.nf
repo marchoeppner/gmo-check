@@ -16,13 +16,14 @@ process VSEARCH_FASTQMERGE {
     path("versions.yml"), emit: versions
 
     script:
+    def args = task.ext.args ?: ''
     merged = meta.sample_id + '.merged.fastq'
 
     """
     vsearch --fastq_merge $fwd --reverse $rev \
     --threads ${task.cpus} \
     --fastqout $merged \
-    --fastq_eeout
+    --fastq_eeout $args
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
