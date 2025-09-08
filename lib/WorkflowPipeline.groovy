@@ -13,11 +13,15 @@ class WorkflowPipeline {
             System.exit(1)
         }
         if (params.tools.contains('bwa2') && !params.reference_base) {
-            log.info 'Cannot run the alignment workflow without genome references (--reference_base). Please check the documentation!'
+            log.info 'Cannot run the alignment workflow without genome references (--reference_base). Please check the documentation!\n'
             System.exit(1)
         }
         if ( !params.input && !params.build_references) {
-            log.info "This pipeline requires a sample sheet as input (--input)"
+            log.info "This pipeline requires a sample sheet as input (--input)\n"
+            System.exit(1)
+        }
+        if (!params.tools) {
+            log.info "Must provide at least one tool chain to run (--tools)\n"
             System.exit(1)
         }
     }

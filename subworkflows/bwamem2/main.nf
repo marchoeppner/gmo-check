@@ -17,6 +17,7 @@ workflow BWAMEM2_WORKFLOW {
     fasta
     bwa_index
     rules
+    primer_bed
 
     main:
 
@@ -65,7 +66,7 @@ workflow BWAMEM2_WORKFLOW {
     // Mask out primer binding sites
     SAMTOOLS_AMPLICONCLIP(
         SAMTOOLS_INDEX.out.bam,
-        ch_bed
+        primer_bed
     )
     ch_versions = ch_versions.mix(SAMTOOLS_AMPLICONCLIP.out.versions)
 
