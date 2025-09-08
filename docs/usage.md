@@ -42,12 +42,12 @@ In this example, both `--reference_base` and the choice of software provisioning
 
 ## Options
 
-### `--input samples.csv` [default = null]
+### `--input samples.tsv` [default = null]
 
 This pipeline expects a CSV-formatted sample sheet to properly pull various meta data through the processes. The required format looks as follows:
 
 ```TSV
-sample  library_id  readgroup_id    R1  R2
+sample  library_id  readgroup_id    fq1  fq2
 S100    S100    AACYTCLM5.1.S100    /home/marc/projects/gaba/data/S100_R1.fastq.gz  /home/marc/projects/gaba/data/S100_R2.fastq.gz
 ```
 
@@ -56,8 +56,8 @@ S100    S100    AACYTCLM5.1.S100    /home/marc/projects/gaba/data/S100_R1.fastq.
 | sample | A unique identifier for this sample |
 | library_id | The name/id of a specific library (samples may have more than one library!) |
 | readgroup_id | A unique identifier for the combination of library, lane and flow cell |
-| R1 | The full path to the forward reads |
-| R2 | The full path to the reverse reads |
+| fq1 | The full path to the forward reads |
+| fq2 | The full path to the reverse reads |
 
 The columns `sample_id` and `library_id` should be self-explanatory. 
 

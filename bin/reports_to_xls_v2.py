@@ -105,8 +105,8 @@ def main(output):
 
                 if report:
                     perc_gmo = float(report["perc_gmo"])
-                    ref_cov = int(report["ref_cov"])
-                    alt_cov = int(report["alt_cov"])
+                    ref_cov = report["ref_cov"]
+                    alt_cov = report["alt_cov"]
                     if ref_cov == "NA" and "bam_cov" in report:
                         ref_cov = report["bam_cov"]
                         alt_cov = "-"
@@ -126,7 +126,7 @@ def main(output):
                 bg_color = cb_even if (row & 1) else cb_uneven
 
             for col in ["A", "B", "C", "D", "E", "F", "G", "H"]:
-                ws[col+str(ws._current_row)].fill = bg_color
+                ws[col + str(ws._current_row)].fill = bg_color
 
         # Auto-width for columns
         dim_holder = DimensionHolder(worksheet=ws)
