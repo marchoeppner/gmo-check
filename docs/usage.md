@@ -74,7 +74,7 @@ For a hypothetical library called "LIB100", this  can be turned into the readgro
 
 </details>
 
-### `--genome tomato` [default = tomato]
+### `--genome tomato` [default = null]
 
 The name of the pre-configured genome to analyze against. This parameter controls not only the mapping reference (if you use a mapping-based analysis), but also which internally pre-configured configuration files are used. Currently, only one genome can be analyzed per pipeline run. 
 
@@ -90,7 +90,7 @@ A mandatory name for this run, to be included with the result files.
 
 An email address to which the MultiQC report is send after pipeline completion. This requires for the executing system to have [sendmail](https://rimuhosting.com/support/settingupemail.jsp?mta=sendmail) configured. 
 
-### `--tools vsearch` [default = vsearch]
+### `--tools aTool` [default = null]
 
 This pipeline supports two completely independent tool chains:
 
@@ -100,7 +100,7 @@ This pipeline supports two completely independent tool chains:
 
 You can specify either one, or both: `--tools 'vsearch,bwa2'` 
 
-Which tool chain is the best choice? Well, technically both options give near-identical results. So in this case `vsearch` would be the better option since it runs significantly faster. However, this pipeline is designed to (theoretically) handle many more types of genetic variants, not all of which are necessarily detectable without a proper variant calling. This is why the `bwa2` option exists - future proofing. 
+Which tool chain is the best choice? Well, technically both options give near-identical results in our tests. So in this case `vsearch` would be the better option since it runs significantly faster. However, this pipeline is designed to (theoretically) handle many more types of genetic variants, not all of which are necessarily detectable without a proper variant calling. This is why the `bwa2` option exists - future proofing. 
 
 ### `--reference_base` [default = null ]
 

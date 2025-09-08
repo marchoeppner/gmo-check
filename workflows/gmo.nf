@@ -70,7 +70,6 @@ workflow GMO {
     ch_versions = ch_versions.mix(FASTP.out.versions)
     multiqc_files = multiqc_files.mix(FASTP.out.json)
 
-    FASTP.out.reads.view()
     /*
     Perform alignment and variant calling
     using BWA-MEM2 and Freebayes
