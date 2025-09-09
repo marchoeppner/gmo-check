@@ -36,10 +36,11 @@ workflow GMO {
     fasta           = params.references.genomes[params.genome].fasta                                     // The reference genome to be used
     fai             = params.references.genomes[params.genome].fai                                       // The fasta index of the reference genome
     dict            = params.references.genomes[params.genome].dict                                      // The dictionary of the reference genome
-    bwa_index       = Channel.fromPath(file(params.references.genomes[params.genome].fasta).parent)      // a directory with the BWA2 index files
+    bwa_index       = Channel.fromPath(file(params.references.genomes[params.genome].fasta).parent).collect()      // a directory with the BWA2 index files
     references      = [ fasta, fai, dict ]                                                               // The fasta reference with fai and dict (mostly Freebayes)
     ch_amplicon_txt = Channel.fromPath(params.references.genomes[params.genome].amplicon_txt).collect()  // The ptrimmer primer manifest
     ch_rules        = Channel.fromPath(params.references.genomes[params.genome].rules).collect()         // rules to define what we consider a hit
+    ch_primer_bed   = Channel.fromPath(params.references.genomes[params.genome].bed).collect()    // Location of the primers for masking
 
     samplesheet     = params.input ? Channel.fromPath(params.input) : Channel.value([])                  // the samplesheet with name and location of the sample(s)
 
@@ -79,7 +80,8 @@ workflow GMO {
             FASTP.out.reads,
             references,
             bwa_index,
-            ch_rules
+            ch_rules,
+            ch_primer_bed
         )
         multiqc_files   = multiqc_files.mix(BWAMEM2_WORKFLOW.out.qc)
         ch_versions     = ch_versions.mix(BWAMEM2_WORKFLOW.out.versions)

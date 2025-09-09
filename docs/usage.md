@@ -42,12 +42,12 @@ In this example, both `--reference_base` and the choice of software provisioning
 
 ## Options
 
-### `--input samples.csv` [default = null]
+### `--input samples.tsv` [default = null]
 
 This pipeline expects a CSV-formatted sample sheet to properly pull various meta data through the processes. The required format looks as follows:
 
 ```TSV
-sample  library_id  readgroup_id    R1  R2
+sample  library_id  readgroup_id    fq1  fq2
 S100    S100    AACYTCLM5.1.S100    /home/marc/projects/gaba/data/S100_R1.fastq.gz  /home/marc/projects/gaba/data/S100_R2.fastq.gz
 ```
 
@@ -56,8 +56,8 @@ S100    S100    AACYTCLM5.1.S100    /home/marc/projects/gaba/data/S100_R1.fastq.
 | sample | A unique identifier for this sample |
 | library_id | The name/id of a specific library (samples may have more than one library!) |
 | readgroup_id | A unique identifier for the combination of library, lane and flow cell |
-| R1 | The full path to the forward reads |
-| R2 | The full path to the reverse reads |
+| fq1 | The full path to the forward reads |
+| fq2 | The full path to the reverse reads |
 
 The columns `sample_id` and `library_id` should be self-explanatory. 
 
@@ -74,7 +74,7 @@ For a hypothetical library called "LIB100", this  can be turned into the readgro
 
 </details>
 
-### `--genome tomato` [default = tomato]
+### `--genome tomato` [default = null]
 
 The name of the pre-configured genome to analyze against. This parameter controls not only the mapping reference (if you use a mapping-based analysis), but also which internally pre-configured configuration files are used. Currently, only one genome can be analyzed per pipeline run. 
 
@@ -90,7 +90,7 @@ A mandatory name for this run, to be included with the result files.
 
 An email address to which the MultiQC report is send after pipeline completion. This requires for the executing system to have [sendmail](https://rimuhosting.com/support/settingupemail.jsp?mta=sendmail) configured. 
 
-### `--tools vsearch` [default = vsearch]
+### `--tools aTool` [default = null]
 
 This pipeline supports two completely independent tool chains:
 
@@ -100,7 +100,7 @@ This pipeline supports two completely independent tool chains:
 
 You can specify either one, or both: `--tools 'vsearch,bwa2'` 
 
-Which tool chain is the best choice? Well, technically both options give near-identical results. So in this case `vsearch` would be the better option since it runs significantly faster. However, this pipeline is designed to (theoretically) handle many more types of genetic variants, not all of which are necessarily detectable without a proper variant calling. This is why the `bwa2` option exists - future proofing. 
+Which tool chain is the best choice? Well, technically both options give near-identical results in our tests. So in this case `vsearch` would be the better option since it runs significantly faster. However, this pipeline is designed to (theoretically) handle many more types of genetic variants, not all of which are necessarily detectable without a proper variant calling. This is why the `bwa2` option exists - future proofing. 
 
 ### `--reference_base` [default = null ]
 

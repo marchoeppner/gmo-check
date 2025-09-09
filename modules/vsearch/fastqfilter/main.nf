@@ -16,12 +16,14 @@ process VSEARCH_FASTQFILTER {
     path("versions.yml"), emit: versions
 
     script:
+    def args = task.ext.args ?: ''
     filtered = fq.getBaseName() + '.filtered.fasta'
-
+    
     """
     vsearch -fastq_filter $fq \
-    -fastq_maxee 0.5 \
-    --threads ${task.cpus} \
+    $args \
+    --sample $meta.sample_id \
+    -threads ${task.cpus} \
     -relabel Filtered \
     -fastaout $filtered
 
