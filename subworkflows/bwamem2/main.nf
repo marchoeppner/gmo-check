@@ -5,7 +5,6 @@ include { BWAMEM2_MEM }             from './../../modules/bwamem2/mem'
 include { SAMTOOLS_MERGE }          from './../../modules/samtools/merge'
 include { SAMTOOLS_MARKDUP }        from './../../modules/samtools/markdup'
 include { SAMTOOLS_INDEX }          from './../../modules/samtools/index'
-include { SAMTOOLS_AMPLICONCLIP }   from './../../modules/samtools/ampliconclip'
 include { FREEBAYES }               from './../../modules/freebayes'
 include { VCF_TO_REPORT }           from './../../modules/helper/vcf_to_report'
 include { RULES_TO_BED }            from './../../modules/helper/rules_to_bed'
@@ -17,7 +16,6 @@ workflow BWAMEM2_WORKFLOW {
     fasta
     bwa_index
     rules
-    primer_bed
 
     main:
 
@@ -63,16 +61,9 @@ workflow BWAMEM2_WORKFLOW {
     SAMTOOLS_INDEX(SAMTOOLS_MERGE.out.bam.mix(bam_to_merge.single))
     ch_versions = ch_versions.mix(SAMTOOLS_INDEX.out.versions)
 
-    // Mask out primer binding sites
-    SAMTOOLS_AMPLICONCLIP(
-        SAMTOOLS_INDEX.out.bam,
-        primer_bed
-    )
-    ch_versions = ch_versions.mix(SAMTOOLS_AMPLICONCLIP.out.versions)
-
     // Call variants using Freebayes
     FREEBAYES(
-        SAMTOOLS_AMPLICONCLIP.out.bam,
+        SAMTOOLS_INDEX.out.bam,
         fasta,
         ch_bed
     )
@@ -84,7 +75,7 @@ workflow BWAMEM2_WORKFLOW {
     even with the sample only contains wildtype, i.e. no variant calls
     */
     MOSDEPTH(
-        SAMTOOLS_AMPLICONCLIP.out.bam,
+        SAMTOOLS_INDEX.out.bam,
         ch_bed
     )
     ch_versions = ch_versions.mix(MOSDEPTH.out.versions)
@@ -104,5 +95,5 @@ workflow BWAMEM2_WORKFLOW {
     versions    = ch_versions
     vcf         = FREEBAYES.out.vcf
     reports     = ch_reports
-    bam         = SAMTOOLS_AMPLICONCLIP.out.bam
+    bam         = SAMTOOLS_INDEX.out.bam
 }

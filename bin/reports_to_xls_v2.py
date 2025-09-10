@@ -131,7 +131,8 @@ def main(output):
         # Auto-width for columns
         dim_holder = DimensionHolder(worksheet=ws)
         for column in range(ws.min_column, ws.max_column + 1):
-            dim_holder[get_column_letter(column)] = ColumnDimension(ws, min=column, max=column, width=20)
+            dimensions = ColumnDimension(ws, min=column, max=column, width=20)
+            dim_holder[get_column_letter(column)] = dimensions
         ws.column_dimensions = dim_holder
         ws.freeze_panes = ws["A3"]
 

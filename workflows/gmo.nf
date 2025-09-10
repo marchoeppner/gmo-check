@@ -2,10 +2,8 @@
 Modules to include
 */
 include { INPUT_CHECK }                 from './../modules/input_check'
-include { FASTP }                       from './../modules/fastp'
 include { MULTIQC }                     from './../modules/multiqc'
 include { BLAST_MAKEBLASTDB }           from './../modules/blast/makeblastdb'
-include { BIOBLOOMTOOLS_CATEGORIZER }   from './../modules/biobloomtools/categorizer'
 include { JSON_TO_XLSX }                from './../modules/helper/json_to_xlsx'
 include { JSON_TO_MQC }                 from './../modules/helper/json_to_mqc'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from './../modules/custom/dumpsoftwareversions'
@@ -14,7 +12,9 @@ include { CUSTOM_DUMPSOFTWAREVERSIONS } from './../modules/custom/dumpsoftwareve
 Subworkflows to include
 */
 include { VSEARCH_WORKFLOW }            from './../subworkflows/vsearch'
+include { DADA2_WORKFLOW }              from './../subworkflows/dada2'
 include { BWAMEM2_WORKFLOW }            from './../subworkflows/bwamem2'
+include { TRIMMING }                    from './../subworkflows/trimming'
 
 // workflow starts here
 workflow GMO {
@@ -40,7 +40,6 @@ workflow GMO {
     references      = [ fasta, fai, dict ]                                                               // The fasta reference with fai and dict (mostly Freebayes)
     ch_amplicon_txt = Channel.fromPath(params.references.genomes[params.genome].amplicon_txt).collect()  // The ptrimmer primer manifest
     ch_rules        = Channel.fromPath(params.references.genomes[params.genome].rules).collect()         // rules to define what we consider a hit
-    ch_primer_bed   = Channel.fromPath(params.references.genomes[params.genome].bed).collect()    // Location of the primers for masking
 
     samplesheet     = params.input ? Channel.fromPath(params.input) : Channel.value([])                  // the samplesheet with name and location of the sample(s)
 
@@ -51,25 +50,21 @@ workflow GMO {
     multiqc_files   = Channel.from([])
     ch_reports      = Channel.from([])
 
+    pipeline_settings = Channel.fromPath(dumpParametersToJSON(params.outdir)).collect()
+
     // Capture list of requested tool chains
     tools = params.tools ? params.tools.split(',').collect { it.trim().toLowerCase().replaceAll('-', '').replaceAll('_', '') } : []
 
     // read the sample sheet and turn into channel with meta hash
     INPUT_CHECK(samplesheet)
 
-    // Remove PhiX using a bloom filter
-    BIOBLOOMTOOLS_CATEGORIZER(
-        INPUT_CHECK.out.reads
+    // Trim reads
+    TRIMMING(
+        INPUT_CHECK.out.reads,
+        ch_amplicon_txt
     )
-    ch_versions = ch_versions.mix(BIOBLOOMTOOLS_CATEGORIZER.out.versions)
-    multiqc_files = multiqc_files.mix(BIOBLOOMTOOLS_CATEGORIZER.out.results)
-
-    // trim reads using fastP in automatic mode and with overlap correction
-    FASTP(
-        BIOBLOOMTOOLS_CATEGORIZER.out.reads
-    )
-    ch_versions = ch_versions.mix(FASTP.out.versions)
-    multiqc_files = multiqc_files.mix(FASTP.out.json)
+    ch_versions = ch_versions.mix(TRIMMING.out.versions)
+    multiqc_files = multiqc_files.mix(TRIMMING.out.qc)
 
     /*
     Perform alignment and variant calling
@@ -77,11 +72,10 @@ workflow GMO {
     */
     if ('bwa2' in tools) {
         BWAMEM2_WORKFLOW(
-            FASTP.out.reads,
+            TRIMMING.out.trimmed,
             references,
             bwa_index,
-            ch_rules,
-            ch_primer_bed
+            ch_rules
         )
         multiqc_files   = multiqc_files.mix(BWAMEM2_WORKFLOW.out.qc)
         ch_versions     = ch_versions.mix(BWAMEM2_WORKFLOW.out.versions)
@@ -99,13 +93,30 @@ workflow GMO {
         ch_versions = ch_versions.mix(BLAST_MAKEBLASTDB.out.versions)
 
         VSEARCH_WORKFLOW(
-            FASTP.out.reads,
+            TRIMMING.out.trimmed,
             BLAST_MAKEBLASTDB.out.db.collect(),
-            ch_amplicon_txt,
             ch_rules
         )
         ch_versions = ch_versions.mix(VSEARCH_WORKFLOW.out.versions)
         ch_reports  = ch_reports.mix(VSEARCH_WORKFLOW.out.reports)
+    }
+    /*
+    Amplicon clustering and pattern matching
+    against a BLAST database with Dada2
+    */
+    if ('dada2' in tools) {
+        BLAST_MAKEBLASTDB(
+            ch_db_file
+        )
+        ch_versions = ch_versions.mix(BLAST_MAKEBLASTDB.out.versions)
+
+        DADA2_WORKFLOW(
+            TRIMMING.out.trimmed,
+            BLAST_MAKEBLASTDB.out.db.collect(),
+            ch_rules
+        )
+        ch_versions = ch_versions.mix(DADA2_WORKFLOW.out.versions)
+        ch_reports  = ch_reports.mix(DADA2_WORKFLOW.out.reports)
     }
 
     // Parse all reports and make an XLS file
@@ -133,4 +144,17 @@ workflow GMO {
 
     emit:
     qc = MULTIQC.out.html
+}
+
+// turn the summaryMap to a JSON file
+def dumpParametersToJSON(outdir) {
+    def timestamp = new java.util.Date().format('yyyy-MM-dd_HH-mm-ss')
+    def filename  = "params_${timestamp}.json"
+    def temp_pf   = new File(workflow.launchDir.toString(), ".${filename}")
+    def jsonStr   = groovy.json.JsonOutput.toJson(params)
+    temp_pf.text  = groovy.json.JsonOutput.prettyPrint(jsonStr)
+
+    nextflow.extension.FilesEx.copyTo(temp_pf.toPath(), "${outdir}/pipeline_info/params_${timestamp}.json")
+    temp_pf.delete()
+    return file("${outdir}/pipeline_info/params_${timestamp}.json")
 }
