@@ -101,18 +101,23 @@ def main(output):
                 ref_cov = ""
                 alt_cov = ""
 
-                report = [d for d in reports if d['toolchain'] == tool][0]
+                report = [d for d in reports if d['toolchain'] == tool]
 
                 if report:
-                    perc_gmo = float(report["perc_gmo"])
-                    ref_cov = report["ref_cov"]
-                    alt_cov = report["alt_cov"]
-                    if ref_cov == "NA" and "bam_cov" in report:
-                        ref_cov = report["bam_cov"]
+                    this_report = report[0]
+                    perc_gmo = float(this_report["perc_gmo"])
+                    ref_cov = this_report["ref_cov"]
+                    alt_cov = this_report["alt_cov"]
+                    if ref_cov == "NA" and "bam_cov" in this_report:
+                        ref_cov = this_report["bam_cov"]
                         alt_cov = "-"
+                else:
+                    perc_gmo = "NA"
+                    ref_cov = "-"
+                    alt_cov = "-"
 
                 # Simplistic rule to catch failed samples.
-                if ref_cov < 100:
+                if ref_cov == "-" or ref_cov < 100:
                     failed = True
 
                 for e in [perc_gmo, ref_cov, alt_cov]:

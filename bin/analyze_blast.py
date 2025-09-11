@@ -66,9 +66,9 @@ def main(sample, blast_data, ref_data, output):
 
         if has_matched:
             perc = (float(carrier_cov) / float(total_cov)) * 100
-            data["matches"].append({"rule": rule_name, "toolchain": "vsearch", "result": rule["positive_report"], "perc_gmo": round(perc, 2), "ref_cov": (total_cov-carrier_cov), "alt_cov": carrier_cov})
+            data["matches"].append({"rule": rule_name, "toolchain": "vsearch", "result": rule["positive_report"], "perc_gmo": round(perc, 2), "ref_cov": (total_cov - carrier_cov), "alt_cov": carrier_cov})
         else:
-            data["matches"].append({"rule": rule_name, "toolchain": "vsearch", "result": rule["negative_report"], "ref_cov": total_cov, "alt_cov": "NA"})
+            data["matches"].append({"rule": rule_name, "toolchain": "vsearch", "result": rule["negative_report"], "perc_gmo": 0, "ref_cov": total_cov, "alt_cov": "NA"})
 
     with open(output, "w") as fo:
         json.dump(data, fo, indent=4, sort_keys=True)

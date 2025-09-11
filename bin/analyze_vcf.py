@@ -72,8 +72,8 @@ def main(sample, vcf_file, ref_data, coverage_file, output):
                 # To get the real coverage, we take the mosdepth coverage
                 # and derive coverages via the AD fractions at this locus
                 if this_cov != "NA":
-                    rfrac = float(rcov)/float(cov_sum)
-                    afrac = float(acov)/float(cov_sum)
+                    rfrac = float(rcov) / float(cov_sum)
+                    afrac = float(acov) / float(cov_sum)
                     rcov = round((rfrac * this_cov), 0)
                     acov = round((afrac * this_cov), 0)
                     cov_sum = this_cov
