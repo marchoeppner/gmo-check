@@ -49,7 +49,7 @@ def main(output):
             "# pconfig:",
             "#    id: 'custom_bargraph_w_header'",
             "#    ylab: 'Anteil GMO'"
-            ]
+        ]
 
         csv_list = []
 
@@ -85,6 +85,7 @@ def main(output):
                 # Check if we have an entry for this tool chain
                 data = next((item for item in reports if item["toolchain"] == toolchain), None)
                 if data:
+                    print(data)
                     this_row.append(str(data["perc_gmo"]))
                 else:
                     this_row.append("-")
