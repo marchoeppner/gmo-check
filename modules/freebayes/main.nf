@@ -18,16 +18,15 @@ process FREEBAYES {
     path("versions.yml"), emit: versions
 
     script:
+    def args = task.ext.args ?: ''
     vcf = meta.sample_id + '.freebayes.vcf'
 
     """
-    freebayes -f $fasta \
-        --genotype-qualities \
-        --pooled-continuous \
-        --min-alternate-count ${params.freebayes_min_alternate_count} \
-        --min-alternate-fraction ${params.freebayes_min_alternate_frac} \
-        -t $target_bed \
-        --report-monomorphic \
+    freebayes -f $fasta \\
+        --genotype-qualities \\
+        $args \\
+        -t $target_bed \\
+        --report-monomorphic \\
         $bam > $vcf
 
     cat <<-END_VERSIONS > versions.yml

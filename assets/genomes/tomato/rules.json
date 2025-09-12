@@ -7,8 +7,8 @@
                     "name": "GABA Mutation in SIGAD3",
                     "target": "SiGAD3|NM_001246898.2",
                     "matcher": "AAAG-TGGA",
-                    "positive_report": "Diese Probe enthält eine GABA Mutation in SIGAD3. Nachweis erbraucht über: Amplicon Analyse.",
-                    "negative_report": "Für diese Probe konnte keine GABA Mutation in SIGAD3 nachgewiesen werden."
+                    "positive_report": "This sample includes a GABA mutation in SIGAD3. Detection by: amplicon analysis.",
+                    "negative_report": "No GABA mutation detected in SIGAD3."
                 }
             ]
             
@@ -20,8 +20,8 @@
                     "target": "1:14834-14836",
                     "name": "GABA Mutation in SIGAD3",
                     "matcher": "1\t14834\t.\tGTG\tGTTG",
-                    "positive_report": "Diese Probe enthält eine GABA Mutation in SIGAD3. Nachweis erbracht über: Varianten Analyse.",
-                    "negative_report": "Für diese Probe konnte keine GABA Mutation in SIGAD3 nachgewiesen werden."
+                    "positive_report": "This sample includes a GABA mutation in SIGAD3. Detection by: variant analysis.",
+                    "negative_report": "No GABA mutation detected in SIGAD3."
                 } 
             ]
         }
